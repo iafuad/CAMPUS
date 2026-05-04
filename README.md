@@ -100,6 +100,3 @@ pip freeze > requirements.txt
 - Follow the existing project structure under the `apps/` folder. Each app contains its own models, views and migrations.
 - Keep `requirements.txt` up-to-date when adding packages.
 - Run migrations and tests locally before opening pull requests.
-
-If you want, I can add a `.env.example` file, a contributor checklist, or Docker/devcontainer configs—tell me which you'd prefer.
-
