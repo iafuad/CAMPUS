@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Load environment variables from .env file
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -39,6 +40,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "apps.accounts.apps.AccountsConfig",
+    "apps.media.apps.MediaConfig",
+    "apps.threads.apps.ThreadsConfig",
     "apps.forum.apps.ForumConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -63,7 +67,7 @@ ROOT_URLCONF = "campus.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -91,6 +95,10 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
+
+
+# User model
+AUTH_USER_MODEL = "accounts.User"
 
 
 # Password validation
@@ -128,3 +136,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "media/"
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
