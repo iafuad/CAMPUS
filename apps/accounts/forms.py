@@ -9,7 +9,7 @@ class RegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email", "password"]  # add "handle" if you created one
+        fields = ["email", "handle", "password"]
 
     def save(self, commit=True):
         user = super().save(commit=False)
