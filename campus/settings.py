@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.media.apps.MediaConfig",
     "apps.threads.apps.ThreadsConfig",
     "apps.forum.apps.ForumConfig",
+    "apps.lost_found.apps.LostFoundConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
