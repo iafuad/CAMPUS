@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils.html import format_html
 
 
 def upload_to(instance, filename):
@@ -21,3 +22,12 @@ class Photo(models.Model):
 
     def __str__(self):
         return f"Photo {self.id} by {self.uploaded_by}"
+
+    def thumbnail(self):
+        if self.file:
+            return format_html(
+                '<a href="{}" target="_blank"><img src="{}" width="50" height="50" /></a>',
+                self.file.url,
+                self.file.url,
+            )
+        return "No image"

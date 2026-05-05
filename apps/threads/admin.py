@@ -4,8 +4,12 @@ from .models import (
     ThreadMessage,
     MessageVote,
     MessageAttachment,
+    ThreadMessageStatus,
     ThreadParticipant,
     Tag,
+    ThreadStatus,
+    ThreadMessageStatus,
+    VoteStatus,
 )
 
 
@@ -24,7 +28,7 @@ class MessageAttachmentInline(admin.TabularInline):
 class ThreadAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "created_by", "status", "created_at")
     list_filter = ("status", "created_at")
-    search_fields = ("title", "description")
+    search_fields = ("title", "description", "created_by__email")
 
     inlines = [ThreadMessageInline]
 
@@ -34,8 +38,8 @@ class ThreadAdmin(admin.ModelAdmin):
 @admin.register(ThreadMessage)
 class ThreadMessageAdmin(admin.ModelAdmin):
     list_display = ("id", "thread", "sender", "short_content", "sent_at")
-    list_filter = ("sent_at",)
-    search_fields = ("content",)
+    list_filter = ("sent_at", "status")
+    search_fields = ("content", "sender__email")
 
     inlines = [MessageAttachmentInline]
 
@@ -48,20 +52,45 @@ class ThreadMessageAdmin(admin.ModelAdmin):
 @admin.register(MessageVote)
 class MessageVoteAdmin(admin.ModelAdmin):
     list_display = ("id", "message", "user", "vote_type", "created_at")
-    list_filter = ("vote_type",)
+    list_filter = ("vote_type", "created_at", "status__name")
 
 
 @admin.register(MessageAttachment)
 class MessageAttachmentAdmin(admin.ModelAdmin):
-    list_display = ("id", "message", "photo")
+    list_display = (
+        "id",
+        "message",
+        "photo",
+        "photo_thumbnail",
+    )
+
+    def photo_thumbnail(self, obj):
+        return obj.photo.thumbnail() if obj.photo else "No photo"
+
+    photo_thumbnail.short_description = "Thumbnail"
 
 
 @admin.register(ThreadParticipant)
 class ThreadParticipantAdmin(admin.ModelAdmin):
     list_display = ("thread", "user", "role", "joined_at")
-    list_filter = ("role",)
+    list_filter = ("thread", "user", "role")
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+
+
+@admin.register(ThreadStatus)
+class ThreadStatusAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+
+
+@admin.register(ThreadMessageStatus)
+class ThreadMessageStatusAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+
+
+@admin.register(VoteStatus)
+class VoteStatusAdmin(admin.ModelAdmin):
     search_fields = ("name",)
