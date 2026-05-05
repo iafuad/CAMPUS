@@ -1,37 +1,44 @@
 from django import forms
-from .models import lost_and_found_post, claim_request
+from .models import LostAndFoundPost, ClaimRequest
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
 
 class LostAndFoundPostForm(forms.ModelForm):
     uploaded_photos = forms.ImageField(
-        widget=forms.ClearableFileInput(attrs={'multiple': True}),
+        widget=MultipleFileInput(attrs={"multiple": True}),
         required=False,
-        label="Upload Photos"
+        label="Upload Photos",
     )
 
     class Meta:
-        model = lost_and_found_post
+        model = LostAndFoundPost
         fields = [
-            'title',
-            'description',
-            'lost_or_found_date',
-            'location',
-            'type',
-            'lost_and_found_category',
+            "title",
+            "description",
+            "lost_or_found_date",
+            "location",
+            "type",
+            "category",
         ]
         widgets = {
-            'lost_or_found_date': forms.DateInput(attrs={'type': 'date'}),
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'type': forms.Select(choices=[('lost', 'Lost'), ('found', 'Found')])
+            "lost_or_found_date": forms.DateInput(attrs={"type": "date"}),
+            "description": forms.Textarea(attrs={"rows": 4}),
+            "type": forms.Select(choices=[("lost", "Lost"), ("found", "Found")]),
         }
 
 
 class ClaimRequestForm(forms.ModelForm):
     class Meta:
-        model = claim_request
-        fields = ['message']
+        model = ClaimRequest
+        fields = ["message"]
         widgets = {
-            'message': forms.Textarea(attrs={
-                'rows': 4, 
-                'placeholder': 'Explain why you are claiming this item or provide proof of ownership/finding...'
-            }),
+            "message": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "placeholder": "Explain why you are claiming this item or provide proof of ownership/finding...",
+                }
+            ),
         }

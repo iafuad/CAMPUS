@@ -1,11 +1,20 @@
 from django.contrib import admin
-from .models import (lost_and_found_status, lost_and_found_category, lost_and_found_post, claim_request_status, claim_request, lost_and_found_match, claim_request_thread)
+from .models import (
+    LostAndFoundStatus,
+    LostAndFoundCategory,
+    LostAndFoundPost,
+    ClaimRequestStatus,
+    ClaimRequest,
+    LostAndFoundMatch,
+    LostAndFoundMatchStatus,
+    ClaimThread,
+)
 
-# Register your models here.
-admin.site.register(lost_and_found_status)
-admin.site.register(lost_and_found_category)
-admin.site.register(lost_and_found_post)
-admin.site.register(claim_request_status)
-admin.site.register(claim_request)
-admin.site.register(lost_and_found_match)
-admin.site.register(claim_request_thread)
+admin.site.register(LostAndFoundStatus)
+admin.site.register(LostAndFoundCategory)
+admin.site.register(LostAndFoundPost)
+admin.site.register(ClaimRequestStatus)
+admin.site.register(ClaimRequest)
+admin.site.register(LostAndFoundMatch)
+admin.site.register(LostAndFoundMatchStatus)
+admin.site.register(ClaimThread)

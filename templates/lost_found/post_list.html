@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lost & Found</title>
+</head>
+<body>
+    <h1>Lost & Found Posts</h1>
+
+    <p>
+        <a href="{% url 'post_create' %}">Create a new post</a>
+    </p>
+
+    {% if posts %}
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <strong>{{ post.title }}</strong>
+                    <p>Type: {{ post.type|capfirst }}</p>
+                    <p>Posted: {{ post.created_at|date:"M d, Y" }}</p>
+                    <p>Location: {{ post.location }}</p>
+                    <p>Category: {{ post.category.name }}</p>
+                    <p>Status: {{ post.status.name }}</p>
+                    <p><a href="{% url 'lost_found_post_detail' id=post.id %}">View details</a></p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No lost and found posts are available yet.</p>
+    {% endif %}
+</body>
+</html>
