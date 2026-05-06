@@ -131,6 +131,11 @@ class MessageVote(models.Model):
 
 
 class ThreadParticipant(models.Model):
+    THREAD_PARTICIPANT_ROLES = [
+        ("AUTHOR", "Author"),
+        ("MEMBER", "Member"),
+        ("MODERATOR", "Moderator"),
+    ]
     thread = models.ForeignKey(
         Thread, on_delete=models.CASCADE, related_name="participants"
     )
@@ -141,7 +146,9 @@ class ThreadParticipant(models.Model):
         related_name="thread_participations",
     )
 
-    role = models.CharField(max_length=50, default="member")
+    role = models.CharField(
+        max_length=50, choices=THREAD_PARTICIPANT_ROLES, default="MEMBER"
+    )
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
