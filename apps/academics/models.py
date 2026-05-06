@@ -31,7 +31,7 @@ class Course(models.Model):
 
 
 class Section(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=2, unique=True)
 
     def save(self, *args, **kwargs):
         self.name = self.name.upper()
@@ -64,7 +64,7 @@ class Trimester(models.Model):
         return f"{term} {self.get_year()}"
 
     def clean(self):
-        term = self.get_term()
+        term = self.get_term_number()
 
         if term not in self.TERM_MAP:
             raise ValidationError(
