@@ -1,7 +1,37 @@
-<h2>Register</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up</title>
+ <!-- CSS file -->
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+</head>
+<body>
 
-<form method="post">
+<div class="card">
+  <h2>Create Account</h2>
+
+  <!-- Django Form -->
+  <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
+
+    <input type="text" name="first_name" placeholder="First Name" required>
+    <input type="text" name="last_name" placeholder="Last Name" required>
+    <input type="text" name="handle" placeholder="Username" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <p>
+    Already have an account?
+    <a href="{% url 'login' %}">Login</a>
+  </p>
+</div>
+
+</body>
+</html>
