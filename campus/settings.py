@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "apps.threads.apps.ThreadsConfig",
     "apps.forum.apps.ForumConfig",
     "apps.lost_found.apps.LostFoundConfig",
+    "apps.academics.apps.AcademicsConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
