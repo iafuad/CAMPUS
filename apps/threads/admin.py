@@ -26,7 +26,7 @@ class MessageAttachmentInline(admin.TabularInline):
 
 @admin.register(Thread)
 class ThreadAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "created_by", "status", "created_at")
+    list_display = ("id", "title", "status", "created_at")
     list_filter = ("status", "created_at")
     search_fields = ("title", "description", "created_by__email")
 
