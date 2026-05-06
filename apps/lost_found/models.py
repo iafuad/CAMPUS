@@ -6,6 +6,10 @@ from django.conf import settings
 class LostAndFoundStatus(models.Model):
     name = models.CharField(max_length=50)
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.capitalize()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
@@ -18,11 +22,15 @@ class LostAndFoundCategory(models.Model):
 
 
 class LostAndFoundPost(models.Model):
+    POST_TYPE_CHOICES = [
+        ("lost", "Lost"),
+        ("found", "Found"),
+    ]
     title = models.CharField(max_length=100)
     description = models.TextField()
     lost_or_found_date = models.DateField()
     location = models.CharField(max_length=100)
-    type = models.CharField(max_length=10)  # 'lost' or 'found'
+    type = models.CharField(max_length=20, choices=POST_TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -34,16 +42,33 @@ class LostAndFoundPost(models.Model):
     )
     status = models.ForeignKey(LostAndFoundStatus, on_delete=models.CASCADE)
     category = models.ForeignKey(LostAndFoundCategory, on_delete=models.CASCADE)
-    photos = models.ManyToManyField(
-        "media.Photo", blank=True, related_name="lost_and_found_posts"
-    )
 
     def __str__(self):
         return self.title
 
 
+class LostAndFoundPhoto(models.Model):
+    post = models.ForeignKey(
+        LostAndFoundPost,
+        on_delete=models.CASCADE,
+        related_name="post_photos",
+    )
+
+    photo = models.ForeignKey(  # allow reuse
+        "media.Photo",
+        on_delete=models.CASCADE,
+        related_name="lost_found_attachments",
+    )
+
+    order = models.PositiveIntegerField(default=0)
+
+
 class LostAndFoundMatchStatus(models.Model):
     name = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.capitalize()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -61,11 +86,15 @@ class LostAndFoundMatch(models.Model):
     )
 
     def __str__(self):
-        return f"Match {self.match_id} between Lost Post {self.lost_post.title} and Found Post {self.found_post.title}"
+        return f"Match {self.id} between Lost Post {self.lost_post.id} and Found Post {self.found_post.id}"  # type: ignore
 
 
 class ClaimRequestStatus(models.Model):
     name = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.capitalize()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -89,7 +118,7 @@ class ClaimRequest(models.Model):
     )
 
     def __str__(self):
-        return f"Claim {self.claim_id} for post {self.found_post.id}"
+        return f"Claim {self.id} for post {self.found_post.id} through match {self.lost_and_found_match.id}"  # type: ignore
 
 
 class ClaimThread(models.Model):
@@ -99,4 +128,4 @@ class ClaimThread(models.Model):
     )
 
     def __str__(self):
-        return f"Claim Thread for {self.claim_request}"
+        return f"Claim Thread for claim request {self.claim_request.id}"  # type: ignore

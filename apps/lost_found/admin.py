@@ -3,6 +3,7 @@ from .models import (
     LostAndFoundStatus,
     LostAndFoundCategory,
     LostAndFoundPost,
+    LostAndFoundPhoto,
     ClaimRequestStatus,
     ClaimRequest,
     LostAndFoundMatch,
@@ -13,6 +14,7 @@ from .models import (
 admin.site.register(LostAndFoundStatus)
 admin.site.register(LostAndFoundCategory)
 admin.site.register(LostAndFoundPost)
+admin.site.register(LostAndFoundPhoto)
 admin.site.register(ClaimRequestStatus)
 admin.site.register(ClaimRequest)
 admin.site.register(LostAndFoundMatch)
