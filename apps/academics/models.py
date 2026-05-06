@@ -8,7 +8,7 @@ class Department(models.Model):
     short_code = models.CharField(max_length=10, unique=True)
 
     def save(self, *args, **kwargs):
-        self.short_code = self.short_code.capitalize()
+        self.short_code = self.short_code.upper()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -23,7 +23,7 @@ class Course(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.code = self.code.capitalize()
+        self.code = self.code.upper()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -34,7 +34,7 @@ class Section(models.Model):
     name = models.CharField(max_length=100)
 
     def save(self, *args, **kwargs):
-        self.name = self.name.capitalize()
+        self.name = self.name.upper()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -96,7 +96,7 @@ class Trimester(models.Model):
 #     name = models.CharField(max_length=50)
 
 #     def save(self, *args, **kwargs):
-#         self.name = self.name.capitalize()
+#         self.name = self.name.upper()
 #         super().save(*args, **kwargs)
 
 #     def __str__(self):
