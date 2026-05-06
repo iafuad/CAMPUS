@@ -5,21 +5,26 @@ from django.db import models
 class ThreadStatus(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.capitalize()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
 
 class Thread(models.Model):
+    VISIBILITY_CHOICES = [
+        ("PUBLIC", "Public"),
+        ("PRIVATE", "Private"),
+    ]
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
     visibility = models.CharField(
         max_length=20,
-        choices=[
-            ("public", "Public"),
-            ("private", "Private"),
-        ],
-        default="public",
+        choices=VISIBILITY_CHOICES,
+        default="PUBLIC",
     )
 
     status = models.ForeignKey(
@@ -44,7 +49,6 @@ class Thread(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return self.name
@@ -52,6 +56,10 @@ class Tag(models.Model):
 
 class ThreadMessageStatus(models.Model):
     name = models.CharField(max_length=50, unique=True)
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.capitalize()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -84,11 +92,15 @@ class ThreadMessage(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"Message {self.id} in Thread {self.thread_id}"
+        return f"Message {self.id} in Thread {self.thread.id} by {self.sender.username}"
 
 
 class VoteStatus(models.Model):
     name = models.CharField(max_length=50, unique=True)
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.capitalize()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -96,8 +108,8 @@ class VoteStatus(models.Model):
 
 class MessageVote(models.Model):
     VOTE_TYPE_CHOICES = [
-        ("upvote", "Upvote"),
-        ("downvote", "Downvote"),
+        ("UPVOTE", "Upvote"),
+        ("DOWNVOTE", "Downvote"),
     ]
 
     message = models.ForeignKey(
@@ -150,3 +162,5 @@ class MessageAttachment(models.Model):
     photo = models.ForeignKey(
         "media.Photo", on_delete=models.CASCADE, related_name="message_attachments"
     )
+
+    order = models.PositiveIntegerField(default=0)
