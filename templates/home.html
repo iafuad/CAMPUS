@@ -2,8 +2,12 @@
 
 {% if user.is_authenticated %}
     <p>Hello, {{ user }} 👋</p>
-    <a href="/accounts/logout/">Logout</a>
+    <a href="{% url 'myself' %}">View My Profile</a>
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
 {% else %}
-    <a href="/accounts/login/">Login</a> |
-    <a href="/accounts/register/">Register</a>
+    <a href="{% url 'login' %}">Login</a> |
+    <a href="{% url 'register' %}">Register</a>
 {% endif %}

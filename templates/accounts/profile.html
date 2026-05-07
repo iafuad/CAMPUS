@@ -1,0 +1,21 @@
+<h1>Profile</h1>
+
+{% if profile_user.profile.profile_picture %}
+    <img src="{{ profile_user.profile.profile_picture.file.url }}" width="150">
+{% else %}
+    <p>No profile picture</p>
+{% endif %}
+
+<h2>{{ user.first_name }} {{ user.last_name }}</h2>
+<p>@{{ user.handle }}</p>
+<p>{{ user.email }}</p>
+
+<hr>
+
+<h3>Profile Info</h3>
+
+<p>Student ID: {{ profile_user.profile.student_id }}</p>
+<p>Bio: {{ profile_user.profile.bio }}</p>
+<p>Status: {{ profile_user.profile.get_status_display }}</p>
+<p>Verified: {{ profile_user.profile.is_verified }}</p>
+<p>Graduated: {{ profile_user.profile.is_graduated }}</p>
