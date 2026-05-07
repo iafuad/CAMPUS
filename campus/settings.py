@@ -40,6 +40,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    "apps.rankings.apps.RankingsConfig",
     "apps.accounts.apps.AccountsConfig",
     "apps.media.apps.MediaConfig",
     "apps.threads.apps.ThreadsConfig",
