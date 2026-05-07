@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 
+
 # Create your models here.
 class Skill(models.Model):
     skill_name = models.CharField(max_length=100)
@@ -84,7 +85,7 @@ class ExchangePost(models.Model):
     status = models.ForeignKey(ExchangePostStatus, on_delete=models.CASCADE)
 
 
-#class UserSkill(models.Model):
+# class UserSkill(models.Model):
 #    proficiency_level = models.PositiveSmallIntegerField()
 #    proficiency_method = models.CharField(max_length=50)
 #    proficiency_notes = models.TextField(null=True, blank=True)
@@ -102,8 +103,12 @@ class ExchangeMatch(models.Model):
     matched_at = models.DateTimeField(auto_now_add=True)
 
     status = models.ForeignKey(ExchangeMatchStatus, on_delete=models.CASCADE)
-    ex_p_a = models.ForeignKey(ExchangePost, related_name="exchange_post_a", on_delete=models.CASCADE)
-    ex_p_b = models.ForeignKey(ExchangePost, related_name="exchange_post_b", on_delete=models.CASCADE)
+    ex_p_a = models.ForeignKey(
+        ExchangePost, related_name="exchange_post_a", on_delete=models.CASCADE
+    )
+    ex_p_b = models.ForeignKey(
+        ExchangePost, related_name="exchange_post_b", on_delete=models.CASCADE
+    )
 
 
 class ExchangeSession(models.Model):
@@ -145,4 +150,3 @@ class MatchDecision(models.Model):
     )
     status = models.ForeignKey(MatchDecisionStatus, on_delete=models.CASCADE)
     exchange_match = models.ForeignKey(ExchangeMatch, on_delete=models.CASCADE)
-    
