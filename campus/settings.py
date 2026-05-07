@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.forum.apps.ForumConfig",
     "apps.lost_found.apps.LostFoundConfig",
     "apps.academics.apps.AcademicsConfig",
+    "apps.skill_exchange.apps.SkillExchangeConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
