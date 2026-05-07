@@ -74,6 +74,9 @@ class Profile(models.Model):
         choices=STATUS_CHOICES,
         default="PENDING",
     )
+    rank = models.ForeignKey(
+        "rankings.UserRank", on_delete=models.SET_NULL, null=True, blank=True
+    )
     is_verified = models.BooleanField(default=False)
     is_graduated = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
