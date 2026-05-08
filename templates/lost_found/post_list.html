@@ -1,31 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Lost & Found</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Lost & Found Posts</h1>
 
     <p>
-        <a href="{% url 'lost_found:post_create' %}">Create a new post</a>
+      <a href="{% url 'lost_found:post_create' %}">Create a new post</a>
     </p>
 
     {% if posts %}
-        <ul>
-            {% for post in posts %}
-                <li>
-                    <strong>{{ post.title }}</strong>
-                    <p>Type: {{ post.get_type_display }}</p>
-                    <p>Location: {{ post.location }}</p>
-                    <p>Category: {{ post.category.name }}</p>
-                    <p>Status: {{ post.get_status_display }}</p>
-                    <p><a href="{% url 'lost_found:post_detail' post_id=post.id %}">View details</a></p>
-                </li>
-            {% endfor %}
-        </ul>
+    <ul>
+      {% for post in posts %}
+      <li>
+        <strong>{{ post.title }}</strong>
+        <p>Type: {{ post.get_type_display }}</p>
+        <p>Location: {{ post.location }}</p>
+        <p>Category: {{ post.category.name }}</p>
+        <p>Status: {{ post.get_status_display }}</p>
+        <p>
+          <a href="{% url 'lost_found:post_detail' post_id=post.id %}"
+            >View details</a
+          >
+        </p>
+      </li>
+      {% endfor %}
+    </ul>
     {% else %}
-        <p>No lost and found posts are available yet.</p>
+    <p>No lost and found posts are available yet.</p>
     {% endif %}
-</body>
+  </body>
 </html>

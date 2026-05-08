@@ -1,58 +1,66 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>{{ post.title }} - Lost & Found</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>{{ post.title }}</h1>
 
     <div>
-        <h3>Details</h3>
-        <p><strong>Type:</strong> {{ post.get_type_display }}</p>
-        <p><strong>Category:</strong> {{ post.category.name }}</p>
-        <p><strong>Status:</strong> {{ post.get_status_display }}</p>
-        <p><strong>Location:</strong> {{ post.location }}</p>
-        <p><strong>Date:</strong> {{ post.lost_or_found_date }}</p>
-        <p><strong>Posted:</strong> {{ post.created_at|date:"M d, Y" }}</p>
+      <h3>Details</h3>
+      <p><strong>Type:</strong> {{ post.get_type_display }}</p>
+      <p><strong>Category:</strong> {{ post.category.name }}</p>
+      <p><strong>Status:</strong> {{ post.get_status_display }}</p>
+      <p><strong>Location:</strong> {{ post.location }}</p>
+      <p><strong>Date:</strong> {{ post.lost_or_found_date }}</p>
+      <p><strong>Posted:</strong> {{ post.created_at|date:"M d, Y" }}</p>
     </div>
 
     <div>
-        <h3>Description</h3>
-        <p>{{ post.description }}</p>
+      <h3>Description</h3>
+      <p>{{ post.description }}</p>
     </div>
 
     {% if post.post_photos.all %}
     <div>
-        <h3>Photos</h3>
-        <div>
-            {% for photo_entry in post.post_photos.all %}
-            <div style="display: inline-block; margin: 10px;">
-                <img src="{{ photo_entry.photo.file.url }}" alt="{{ post.title }}" style="max-width: 200px; max-height: 200px;">
-            </div>
-            {% endfor %}
+      <h3>Photos</h3>
+      <div>
+        {% for photo_entry in post.post_photos.all %}
+        <div style="display: inline-block; margin: 10px">
+          <img
+            src="{{ photo_entry.photo.file.url }}"
+            alt="{{ post.title }}"
+            style="max-width: 200px; max-height: 200px"
+          />
         </div>
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
 
     <div>
-        <h3>Posted By</h3>
-        <p>{{ post.user.email }}</p>
+      <h3>Posted By</h3>
+      <p>{{ post.user.email }}</p>
     </div>
 
     <div>
-        <h3>Submit a Claim</h3>
-        {% if user.is_authenticated %}
-        <form method="post" action="{% url 'lost_found:submit_claim' post_id=post.id %}">
-            {% csrf_token %}
-            {{ claim_form.as_p }}
-            <button type="submit">Submit Claim</button>
-        </form>
-        {% else %}
-        <p><a href="{% url 'login' %}">Log in</a> to submit a claim for this item.</p>
-        {% endif %}
+      <h3>Submit a Claim</h3>
+      {% if user.is_authenticated %}
+      <form
+        method="post"
+        action="{% url 'lost_found:submit_claim' post_id=post.id %}"
+      >
+        {% csrf_token %} {{ claim_form.as_p }}
+        <button type="submit">Submit Claim</button>
+      </form>
+      {% else %}
+      <p>
+        <a href="{% url 'login' %}">Log in</a> to submit a claim for this item.
+      </p>
+      {% endif %}
     </div>
 
     <p><a href="{% url 'lost_found:post_list' %}">Back to Posts</a></p>
-</body>
+  </body>
 </html>

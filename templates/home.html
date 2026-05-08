@@ -1,18 +1,18 @@
 <h1>Welcome to Campus Platform</h1>
 
 {% if user.is_authenticated %}
-    <p>Hello, {{ user }} 👋</p>
+<p>Hello, {{ user }} 👋</p>
 
-    <a href="{% url 'myself' %}">View My Profile</a><br>
-    <a href="/lost-found">Lost & Found</a><br>
-    <a href="/skill-exchange">Skill Exchange</a><br><br>
-    
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
+<a href="{% url 'myself' %}">View My Profile</a><br />
+<a href="/lost-found">Lost & Found</a><br />
+<a href="/skill-exchange">Skill Exchange</a><br /><br />
+
+<form action="{% url 'logout' %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Logout</button>
+</form>
 
 {% else %}
-    <a href="{% url 'login' %}">Login</a> |
-    <a href="{% url 'register' %}">Register</a>
+<a href="{% url 'login' %}">Login</a> |
+<a href="{% url 'register' %}">Register</a>
 {% endif %}

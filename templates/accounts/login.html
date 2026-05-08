@@ -1,33 +1,38 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
 
     <!-- CSS file -->
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-</head>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+  </head>
 
-<body>
+  <body>
     <div class="login-container">
-        <form class="login-form" method="POST">
-            {% csrf_token %}
-            
-            <h2>Login</h2>
+      <form class="login-form" method="POST">
+        {% csrf_token %}
 
-            <input type="text" name="username" placeholder="Email" required>
-            <input type="password" name="password" placeholder="Password" required>
+        <h2>Login</h2>
 
-            <!-- Correct Django way -->
-            <button type="submit">Login</button>
+        <input type="text" name="username" placeholder="Email" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
 
-            <p class="extra">
-                Don't have an account ?
-                <a href="{% url 'register' %}"> Sign Up </a>
-            </p>
-        </form>
+        <!-- Correct Django way -->
+        <button type="submit">Login</button>
+
+        <p class="extra">
+          Don't have an account ?
+          <a href="{% url 'register' %}"> Sign Up </a>
+        </p>
+      </form>
     </div>
-</body>
+  </body>
 </html>
