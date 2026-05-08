@@ -4,12 +4,8 @@ from .models import (
     ThreadMessage,
     MessageVote,
     MessageAttachment,
-    ThreadMessageStatus,
     ThreadParticipant,
     Tag,
-    ThreadStatus,
-    ThreadMessageStatus,
-    VoteStatus,
 )
 
 
@@ -52,7 +48,7 @@ class ThreadMessageAdmin(admin.ModelAdmin):
 @admin.register(MessageVote)
 class MessageVoteAdmin(admin.ModelAdmin):
     list_display = ("id", "message", "user", "vote_type", "created_at")
-    list_filter = ("vote_type", "created_at", "status__name")
+    list_filter = ("vote_type", "created_at", "status")
 
 
 @admin.register(MessageAttachment)
@@ -78,19 +74,4 @@ class ThreadParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    search_fields = ("name",)
-
-
-@admin.register(ThreadStatus)
-class ThreadStatusAdmin(admin.ModelAdmin):
-    search_fields = ("name",)
-
-
-@admin.register(ThreadMessageStatus)
-class ThreadMessageStatusAdmin(admin.ModelAdmin):
-    search_fields = ("name",)
-
-
-@admin.register(VoteStatus)
-class VoteStatusAdmin(admin.ModelAdmin):
     search_fields = ("name",)

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from apps.common.choices import ProfileStatus
 
 
 class UserManager(BaseUserManager):
@@ -41,24 +42,7 @@ class User(AbstractUser):
     objects = UserManager()
 
 
-# class AccountStatus(models.Model):
-#     name = models.CharField(max_length=50)
-
-#     def save(self, *args, **kwargs):
-#         self.name = self.name.upper()
-#         super().save(*args, **kwargs)
-
-#     def __str__(self):
-#         return self.name
-
-
 class Profile(models.Model):
-    STATUS_CHOICES = [
-        ("PENDING", "Pending"),
-        ("NORMAL", "Normal"),
-        ("FLAGGED", "Flagged"),
-        ("SUSPENDED", "Suspended"),
-    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     student_id = models.IntegerField(unique=True, null=True, blank=True)
     bio = models.TextField(blank=True)
@@ -71,8 +55,8 @@ class Profile(models.Model):
     )
     status = models.CharField(
         max_length=20,
-        choices=STATUS_CHOICES,
-        default="PENDING",
+        choices=ProfileStatus.choices,
+        default=ProfileStatus.PENDING,
     )
     rank = models.ForeignKey(
         "rankings.UserRank", on_delete=models.SET_NULL, null=True, blank=True

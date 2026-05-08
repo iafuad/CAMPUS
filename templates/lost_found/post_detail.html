@@ -11,7 +11,7 @@
         <h3>Details</h3>
         <p><strong>Type:</strong> {{ post.get_type_display }}</p>
         <p><strong>Category:</strong> {{ post.category.name }}</p>
-        <p><strong>Status:</strong> {{ post.status.name }}</p>
+        <p><strong>Status:</strong> {{ post.get_status_display }}</p>
         <p><strong>Location:</strong> {{ post.location }}</p>
         <p><strong>Date:</strong> {{ post.lost_or_found_date }}</p>
         <p><strong>Posted:</strong> {{ post.created_at|date:"M d, Y" }}</p>

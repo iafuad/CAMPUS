@@ -19,7 +19,7 @@
                     <p>Type: {{ post.get_type_display }}</p>
                     <p>Location: {{ post.location }}</p>
                     <p>Category: {{ post.category.name }}</p>
-                    <p>Status: {{ post.status.name }}</p>
+                    <p>Status: {{ post.get_status_display }}</p>
                     <p><a href="{% url 'lost_found:post_detail' post_id=post.id %}">View details</a></p>
                 </li>
             {% endfor %}

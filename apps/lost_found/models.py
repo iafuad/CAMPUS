@@ -1,16 +1,11 @@
 from django.db import models
 from django.conf import settings
-
-
-class LostAndFoundStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
+from apps.common.choices import (
+    LostAndFoundStatus,
+    LostAndFoundMatchStatus,
+    ClaimRequestStatus,
+    LostAndFoundPostType,
+)
 
 
 class LostAndFoundCategory(models.Model):
@@ -28,15 +23,11 @@ class LostAndFoundTag(models.Model):
 
 
 class LostAndFoundPost(models.Model):
-    POST_TYPE_CHOICES = [
-        ("LOST", "Lost"),
-        ("FOUND", "Found"),
-    ]
     title = models.CharField(max_length=100)
     description = models.TextField()
     lost_or_found_date = models.DateField()
     location = models.CharField(max_length=100)
-    type = models.CharField(max_length=20, choices=POST_TYPE_CHOICES)
+    type = models.CharField(max_length=20, choices=LostAndFoundPostType.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -46,7 +37,11 @@ class LostAndFoundPost(models.Model):
         on_delete=models.CASCADE,
         related_name="lost_and_found_posts",
     )
-    status = models.ForeignKey(LostAndFoundStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=LostAndFoundStatus.choices,
+        default=LostAndFoundStatus.PENDING,
+    )
     category = models.ForeignKey(LostAndFoundCategory, on_delete=models.CASCADE)
     tags = models.ManyToManyField(LostAndFoundTag, blank=True)
 
@@ -70,19 +65,12 @@ class LostAndFoundPhoto(models.Model):
     order = models.PositiveIntegerField(default=0)
 
 
-class LostAndFoundMatchStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
 class LostAndFoundMatch(models.Model):
-    status = models.ForeignKey(LostAndFoundMatchStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=LostAndFoundMatchStatus.choices,
+        default=LostAndFoundMatchStatus.PENDING,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     lost_post = models.ForeignKey(
@@ -96,17 +84,6 @@ class LostAndFoundMatch(models.Model):
         return f"Match {self.id} between Lost Post {self.lost_post.id} and Found Post {self.found_post.id}"  # type: ignore
 
 
-class ClaimRequestStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
 class ClaimRequest(models.Model):
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -118,7 +95,11 @@ class ClaimRequest(models.Model):
         on_delete=models.CASCADE,
         related_name="claim_requests",
     )
-    status = models.ForeignKey(ClaimRequestStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=ClaimRequestStatus.choices,
+        default=ClaimRequestStatus.PENDING,
+    )
     found_post = models.ForeignKey(LostAndFoundPost, on_delete=models.CASCADE)
     lost_and_found_match = models.OneToOneField(
         LostAndFoundMatch, on_delete=models.CASCADE

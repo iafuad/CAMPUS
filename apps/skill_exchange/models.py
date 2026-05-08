@@ -1,66 +1,17 @@
 from django.conf import settings
 from django.db import models
+from apps.common.choices import (
+    ExchangePostStatus,
+    ExchangeMatchStatus,
+    ExchangeSessionStatus,
+    SessionFeedbackStatus,
+    MatchDecisionStatus,
+)
 
 
-# Create your models here.
 class Skill(models.Model):
     skill_name = models.CharField(max_length=100)
     description = models.TextField()
-
-
-class ExchangePostStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-class ExchangeMatchStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-class ExchangeSessionStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-class SessionFeedbackStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
-class MatchDecisionStatus(models.Model):
-    name = models.CharField(max_length=50)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
 
 
 class ExchangePost(models.Model):
@@ -82,7 +33,11 @@ class ExchangePost(models.Model):
         Skill,
         related_name="requested_in_posts",
     )
-    status = models.ForeignKey(ExchangePostStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=ExchangePostStatus.choices,
+        default=ExchangePostStatus.PENDING,
+    )
 
 
 # class UserSkill(models.Model):
@@ -102,7 +57,11 @@ class ExchangePost(models.Model):
 class ExchangeMatch(models.Model):
     matched_at = models.DateTimeField(auto_now_add=True)
 
-    status = models.ForeignKey(ExchangeMatchStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=ExchangeMatchStatus.choices,
+        default=ExchangeMatchStatus.PENDING,
+    )
     ex_p_a = models.ForeignKey(
         ExchangePost, related_name="exchange_post_a", on_delete=models.CASCADE
     )
@@ -117,7 +76,11 @@ class ExchangeSession(models.Model):
 
     match = models.OneToOneField(ExchangeMatch, on_delete=models.CASCADE)
     thread = models.OneToOneField("threads.Thread", on_delete=models.CASCADE)
-    status = models.ForeignKey(ExchangeSessionStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=ExchangeSessionStatus.choices,
+        default=ExchangeSessionStatus.PENDING,
+    )
 
 
 class SessionFeedback(models.Model):
@@ -137,7 +100,11 @@ class SessionFeedback(models.Model):
         related_name="feedback_received",
     )
     exchange_session = models.ForeignKey(ExchangeSession, on_delete=models.CASCADE)
-    status = models.ForeignKey(SessionFeedbackStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=SessionFeedbackStatus.choices,
+        default=SessionFeedbackStatus.PENDING,
+    )
 
 
 class MatchDecision(models.Model):
@@ -148,5 +115,9 @@ class MatchDecision(models.Model):
         on_delete=models.CASCADE,
         related_name="match_decisions",
     )
-    status = models.ForeignKey(MatchDecisionStatus, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=MatchDecisionStatus.choices,
+        default=MatchDecisionStatus.PENDING,
+    )
     exchange_match = models.ForeignKey(ExchangeMatch, on_delete=models.CASCADE)

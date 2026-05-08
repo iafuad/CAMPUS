@@ -1,34 +1,29 @@
 from django.conf import settings
 from django.db import models
-
-
-class ThreadStatus(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
+from apps.common.choices import (
+    ThreadStatus,
+    ThreadMessageStatus,
+    VoteStatus,
+    ThreadVisibility,
+    ThreadParticipantRole,
+    VoteType,
+)
 
 
 class Thread(models.Model):
-    VISIBILITY_CHOICES = [
-        ("PUBLIC", "Public"),
-        ("PRIVATE", "Private"),
-    ]
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
     visibility = models.CharField(
         max_length=20,
-        choices=VISIBILITY_CHOICES,
+        choices=ThreadVisibility.choices,
         default="PUBLIC",
     )
 
-    status = models.ForeignKey(
-        ThreadStatus, on_delete=models.PROTECT, related_name="threads"
+    status = models.CharField(
+        max_length=20,
+        choices=ThreadStatus.choices,
+        default=ThreadStatus.OPEN,
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -43,17 +38,6 @@ class Thread(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class ThreadMessageStatus(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -74,8 +58,10 @@ class ThreadMessage(models.Model):
         "self", null=True, blank=True, on_delete=models.CASCADE, related_name="replies"
     )
 
-    status = models.ForeignKey(
-        ThreadMessageStatus, on_delete=models.PROTECT, related_name="messages"
+    status = models.CharField(
+        max_length=20,
+        choices=ThreadMessageStatus.choices,
+        default=ThreadMessageStatus.SENT,
     )
 
     upvote_count = models.PositiveIntegerField(default=0)
@@ -89,23 +75,7 @@ class ThreadMessage(models.Model):
         return f"Message {self.id} in Thread {self.thread.id} by {self.sender.username}"
 
 
-class VoteStatus(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    def save(self, *args, **kwargs):
-        self.name = self.name.upper()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
 class MessageVote(models.Model):
-    VOTE_TYPE_CHOICES = [
-        ("UPVOTE", "Upvote"),
-        ("DOWNVOTE", "Downvote"),
-    ]
-
     message = models.ForeignKey(
         ThreadMessage, on_delete=models.CASCADE, related_name="votes"
     )
@@ -114,10 +84,12 @@ class MessageVote(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="message_votes"
     )
 
-    vote_type = models.CharField(max_length=10, choices=VOTE_TYPE_CHOICES)
+    vote_type = models.CharField(max_length=10, choices=VoteType.choices)
 
-    status = models.ForeignKey(
-        VoteStatus, on_delete=models.PROTECT, related_name="votes"
+    status = models.CharField(
+        max_length=20,
+        choices=VoteStatus.choices,
+        default=VoteStatus.ACTIVE,
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -131,11 +103,6 @@ class MessageVote(models.Model):
 
 
 class ThreadParticipant(models.Model):
-    THREAD_PARTICIPANT_ROLES = [
-        ("AUTHOR", "Author"),
-        ("MEMBER", "Member"),
-        ("MODERATOR", "Moderator"),
-    ]
     thread = models.ForeignKey(
         Thread, on_delete=models.CASCADE, related_name="participants"
     )
@@ -147,7 +114,7 @@ class ThreadParticipant(models.Model):
     )
 
     role = models.CharField(
-        max_length=50, choices=THREAD_PARTICIPANT_ROLES, default="MEMBER"
+        max_length=50, choices=ThreadParticipantRole.choices, default="MEMBER"
     )
     joined_at = models.DateTimeField(auto_now_add=True)
 

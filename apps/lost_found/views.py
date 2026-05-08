@@ -4,11 +4,9 @@ from django.contrib import messages
 from .models import (
     LostAndFoundPost,
     LostAndFoundPhoto,
-    # ClaimRequest,
-    LostAndFoundStatus,
-    # ClaimRequestStatus,
 )
 from .forms import LostAndFoundPostForm, ClaimRequestForm
+from apps.common.choices import LostAndFoundStatus
 from apps.media.models import Photo
 
 
@@ -32,9 +30,7 @@ def post_create(request):
             post = form.save(commit=False)
             post.user = request.user
 
-            # Provide a default status like 'Active' when someone creates a post
-            status, _ = LostAndFoundStatus.objects.get_or_create(name="Active")
-            post.status = status
+            post.status = LostAndFoundStatus.APPROVED
             post.save()
 
             # Handle photo uploads using Photo model from media app

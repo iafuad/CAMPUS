@@ -1,0 +1,102 @@
+# apps/common/choices.py
+from django.db import models
+
+
+# Lost and Found domain choices
+class LostAndFoundStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    APPROVED = "approved", "Approved"
+    REJECTED = "rejected", "Rejected"
+
+
+class LostAndFoundMatchStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    MATCHED = "matched", "Matched"
+    CLOSED = "closed", "Closed"
+
+
+class ClaimRequestStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    APPROVED = "approved", "Approved"
+    REJECTED = "rejected", "Rejected"
+
+
+# Thread domain choices
+class ThreadStatus(models.TextChoices):
+    OPEN = "open", "Open"
+    CLOSED = "closed", "Closed"
+    ARCHIVED = "archived", "Archived"
+
+
+class ThreadMessageStatus(models.TextChoices):
+    SENT = "sent", "Sent"
+    DELETED = "deleted", "Deleted"
+
+
+class VoteStatus(models.TextChoices):
+    ACTIVE = "active", "Active"
+    REVOKED = "revoked", "Revoked"
+
+
+# Skill Exchange domain choices
+class ExchangePostStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    APPROVED = "approved", "Approved"
+    REJECTED = "rejected", "Rejected"
+
+
+class ExchangeMatchStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    MATCHED = "matched", "Matched"
+    CLOSED = "closed", "Closed"
+
+
+class ExchangeSessionStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    ACTIVE = "active", "Active"
+    COMPLETED = "completed", "Completed"
+    CANCELLED = "cancelled", "Cancelled"
+
+
+class SessionFeedbackStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    SUBMITTED = "submitted", "Submitted"
+    REJECTED = "rejected", "Rejected"
+
+
+class MatchDecisionStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    ACCEPTED = "accepted", "Accepted"
+    REJECTED = "rejected", "Rejected"
+
+
+# Lost and Found post types
+class LostAndFoundPostType(models.TextChoices):
+    LOST = "lost", "Lost"
+    FOUND = "found", "Found"
+
+
+# Thread visibility and participant roles
+class ThreadVisibility(models.TextChoices):
+    PUBLIC = "public", "Public"
+    PRIVATE = "private", "Private"
+
+
+class ThreadParticipantRole(models.TextChoices):
+    AUTHOR = "author", "Author"
+    MEMBER = "member", "Member"
+    MODERATOR = "moderator", "Moderator"
+
+
+# Vote types
+class VoteType(models.TextChoices):
+    UPVOTE = "upvote", "Upvote"
+    DOWNVOTE = "downvote", "Downvote"
+
+
+# Accounts domain choices
+class ProfileStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    NORMAL = "normal", "Normal"
+    FLAGGED = "flagged", "Flagged"
+    SUSPENDED = "suspended", "Suspended"
