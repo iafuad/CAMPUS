@@ -1,21 +1,344 @@
-<h1>Profile</h1>
 
-{% if profile_user.profile.profile_picture %}
-    <img src="{{ profile_user.profile.profile_picture.file.url }}" width="150">
-{% else %}
-    <p>No profile picture</p>
-{% endif %}
 
-<h2>{{ user.first_name }} {{ user.last_name }}</h2>
-<p>@{{ user.handle }}</p>
-<p>{{ user.email }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profile</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
 
-<hr>
+</head>
 
-<h3>Profile Info</h3>
 
-<p>Student ID: {{ profile_user.profile.student_id }}</p>
-<p>Bio: {{ profile_user.profile.bio }}</p>
-<p>Status: {{ profile_user.profile.get_status_display }}</p>
-<p>Verified: {{ profile_user.profile.is_verified }}</p>
-<p>Graduated: {{ profile_user.profile.is_graduated }}</p>
+<body>
+<nav>
+  <a class="logo"><span>campus</span></a>
+  <div class="nav-right">
+    <a href="home.html" class="back-btn">← Back to Home</a>
+
+    <!-- Notification Bell -->
+    <div class="notif-wrap">
+      <div class="notif-btn" onclick="toggleNotif()">
+        <span class="notif-icon">🔔</span>
+       
+      </div>
+
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-header">
+          <span class="notif-header-title">Notifications</span>
+          <button class="notif-clear" onclick="clearNotifs()">Clear all</button>
+        </div>
+
+        <div class="notif-list" id="notifList">
+          {% if notifications %}
+            {% for n in notifications %}
+              <div class="notif-item">{{ n.text }}</div>
+            {% endfor %}
+          {% else %}
+            <div class="notif-empty">No notifications.</div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+ 
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="profile-cover">
+      <div class="profile-cover-pattern"></div>
+      <div class="xp-cover-badge">
+        <span class="lvl" >Level {{ profile.level|default:1 }}</span>
+        <span class="pts" >{{ profile.xp|default:0 }} XP</span>
+      </div>
+    </div>
+
+    <div class="profile-info-row">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+          <span id="avatarInitials">
+           {{ user.first_name }} {{ user.last_name }}
+          </span>
+
+        {% if profile_user.profile.profile_picture %}
+        <img src="{{ profile_user.profile.profile_picture.file.url }}" width="150">
+        {% else %}
+        <p>No profile picture</p>
+        {% endif %}
+            
+        </div>
+
+        
+      </div>
+
+      <div class="profile-details">
+        <div class="profile-name" id="displayName">
+          {{ user.get_full_name|default:user.username }}
+        </div>
+        <div class="profile-email" id="displayEmail">
+          {{ user.email }}
+        </div>
+      </div>
+
+      <button class="btn-edit" onclick="openEditModal()">✏️ Edit Profile</button>
+    </div>
+  </div>
+
+  <!-- INFO CARDS -->
+  <div class="cards-grid">
+
+    <div class="info-card">
+      <div class="card-title"><span>👤</span> Basic Info</div>
+
+      <div class="info-row">
+        <div class="info-label">First Name</div>
+        <div class="info-value" id="v-firstName">{{ user.first_name|default:"—" }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Last Name</div>
+        <div class="info-value" id="v-lastName">{{ user.last_name|default:"—" }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value" id="v-email">{{ user.email|default:"—" }}</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title"><span>🎓</span> Academic Info</div>
+
+      <div class="info-row">
+        <div class="info-label">Student ID</div>
+        <div class="info-value" id="v-studentId">
+          {% if profile_user.profile.student_id %}
+            {{ profile_user.profile.student_id }}
+          {% else %}
+            <span class="empty">Not set</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Department</div>
+        <div class="info-value" id="v-dept">
+          {% if profile.department %}
+            {{ profile.department }}
+          {% else %}
+            <span class="empty">Not set</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card full">
+      <div class="card-title"><span>📝</span> Bio</div>
+      <div class="bio-text" id="v-bio">
+        {% if profile_user.profile.bio %}
+          {{ profile_user.profile.bio }}
+        {% else %}
+          <span class="empty">No bio added yet.</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="info-card full">
+      <div class="card-title"><span>⚡</span> Skills</div>
+      <div class="skills-wrap" id="v-skills">
+        {% if profile.skills %}
+          {% for skill in profile.skills %}
+            <span class="skill-tag">{{ skill }}</span>
+          {% endfor %}
+        {% else %}
+          <span class="skill-tag empty-msg">No skills added yet.</span>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>✏️ Edit Profile</h2>
+    <p class="msub">Update your profile information.</p>
+
+    <div class="fg-row">
+      <div class="fg">
+        <label>First Name</label>
+        <input type="text" id="e-firstName" value="{{ user.first_name }}">
+      </div>
+
+      <div class="fg">
+        <label>Last Name</label>
+        <input type="text" id="e-lastName" value="{{ user.last_name }}">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Email</label>
+      <input type="email" id="e-email" value="{{ user.email }}">
+    </div>
+
+    <div class="fg-row">
+      <div class="fg">
+        <label>Student ID</label>
+        <input type="text" id="e-studentId" value="{{ profile.student_id }}">
+      </div>
+
+      <div class="fg">
+        <label>Department</label>
+        <input type="text" id="e-dept" value="{{ profile.department }}">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Bio</label>
+      <textarea id="e-bio">{{  profile_user.profile.bio }}</textarea>
+    </div>
+
+    <div class="fg">
+      <label>Skills</label>
+      <div class="skills-input-wrap">
+        <input type="text" id="e-skillInput" placeholder="e.g. Python, UI Design..."
+          onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}">
+        <button class="btn-add-skill" onclick="addSkill()">+ Add</button>
+      </div>
+
+      <div class="skills-edit-wrap" id="e-skillsList">
+        {% if profile.skills %}
+          {% for skill in profile.skills %}
+            <span class="skill-tag">{{ skill }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-submit" onclick="saveProfile()">Save Profile →</button>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+
+
+
+  // Edit Profile Modal Open
+  function openEditModal() {
+    document.getElementById("editModal").style.display = "flex";
+    document.body.style.overflow = "hidden";
+
+    document.getElementById('e-firstName').value = document.getElementById('v-firstName').textContent.trim().replace('—','');
+    document.getElementById('e-lastName').value  = document.getElementById('v-lastName').textContent.trim().replace('—','');
+    document.getElementById('e-email').value     = document.getElementById('v-email').textContent.trim().replace('—','');
+    document.getElementById('e-studentId').value = document.getElementById('v-studentId').textContent.trim().replace('Not set','');
+    document.getElementById('e-dept').value      = document.getElementById('v-dept').textContent.trim().replace('Not set','');
+    document.getElementById('e-bio').value       = document.getElementById('v-bio').textContent.trim().replace('No bio added yet.','');
+
+    renderSkillTags();
+  }
+
+  // Edit Profile Modal Close
+  function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  // ── SKILLS (DOM ) -using array js..This means that if you reload the page,
+  //  the skills will be gone. 
+  // If you want to save permanently, 
+  // you have to send it to the backend. 
+  let skillsList = [];
+
+ 
+  window.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#v-skills .skill-tag').forEach(tag => {
+      const text = tag.textContent.trim();
+      if (text && text !== 'No skills added yet.') skillsList.push(text);
+    });
+  });
+
+  function renderSkillTags() {
+    const wrap = document.getElementById('e-skillsList');
+    wrap.innerHTML = '';
+    skillsList.forEach((skill, i) => {
+      const tag = document.createElement('span');
+      tag.className = 'skill-edit-tag';
+      tag.innerHTML = `${skill} <button class="skill-remove" onclick="removeSkill(${i})">×</button>`;
+      wrap.appendChild(tag);
+    });
+  }
+
+  function addSkill() {
+    const input = document.getElementById('e-skillInput');
+    const val = input.value.trim();
+    if (!val) return;
+    if (!skillsList.includes(val)) skillsList.push(val);
+    input.value = '';
+    renderSkillTags();
+    input.focus();
+  }
+
+  function removeSkill(index) {
+    skillsList.splice(index, 1);
+    renderSkillTags();
+  }
+// save profile 
+  function saveProfile() {
+    const data = {
+      first_name: document.getElementById('e-firstName').value.trim(),
+      last_name:  document.getElementById('e-lastName').value.trim(),
+      email:      document.getElementById('e-email').value.trim(),
+      student_id: document.getElementById('e-studentId').value.trim(),
+      department: document.getElementById('e-dept').value.trim(),
+      bio:        document.getElementById('e-bio').value.trim(),
+      skills:     skillsList,
+    };
+
+    // page update
+    document.getElementById('displayName').textContent  = data.first_name + ' ' + data.last_name;
+    document.getElementById('displayEmail').textContent = data.email;
+    document.getElementById('v-firstName').textContent  = data.first_name || '—';
+    document.getElementById('v-lastName').textContent   = data.last_name  || '—';
+    document.getElementById('v-email').textContent      = data.email      || '—';
+    document.getElementById('v-studentId').textContent  = data.student_id || 'Not set';
+    document.getElementById('v-dept').textContent       = data.department || 'Not set';
+    document.getElementById('v-bio').textContent        = data.bio        || 'No bio added yet.';
+
+    // skills update
+    const wrap = document.getElementById('v-skills');
+    if (skillsList.length > 0) {
+      wrap.innerHTML = '';
+      skillsList.forEach(function(skill) {
+        const span = document.createElement('span');
+        span.className = 'skill-tag';
+        span.textContent = skill;
+        wrap.appendChild(span);
+      });
+    } else {
+      wrap.innerHTML = '<span class="skill-tag empty-msg">No skills added yet.</span>';
+    }
+
+    closeEditModal();
+    showToast('✅ Profile saved!');
+  }
+</script>
+
+
+  
+
+
+
+</body>
+</html>
