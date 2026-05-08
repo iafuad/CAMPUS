@@ -27,8 +27,8 @@ urlpatterns = [
     path("", include("apps.accounts.urls")),
     path("admin/", admin.site.urls),
     path("forum/", include("apps.forum.urls")),
-    # path("lost_found/", include("apps.lost_found.urls")),
-    path("skill_exchange/", include("apps.skill_exchange.urls")),
+    path("lost-found/", include("apps.lost_found.urls")),
+    path("skill-exchange/", include("apps.skill_exchange.urls")),
 ]
 
 if settings.DEBUG:

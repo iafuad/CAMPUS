@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 
 
-# Create your models here.
 class LostAndFoundStatus(models.Model):
     name = models.CharField(max_length=50)
 
@@ -21,10 +20,17 @@ class LostAndFoundCategory(models.Model):
         return self.name
 
 
+class LostAndFoundTag(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
 class LostAndFoundPost(models.Model):
     POST_TYPE_CHOICES = [
-        ("lost", "Lost"),
-        ("found", "Found"),
+        ("LOST", "Lost"),
+        ("FOUND", "Found"),
     ]
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -42,6 +48,7 @@ class LostAndFoundPost(models.Model):
     )
     status = models.ForeignKey(LostAndFoundStatus, on_delete=models.CASCADE)
     category = models.ForeignKey(LostAndFoundCategory, on_delete=models.CASCADE)
+    tags = models.ManyToManyField(LostAndFoundTag, blank=True)
 
     def __str__(self):
         return self.title

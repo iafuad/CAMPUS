@@ -8,7 +8,7 @@
     <h1>Lost & Found Posts</h1>
 
     <p>
-        <a href="{% url 'post_create' %}">Create a new post</a>
+        <a href="{% url 'lost_found:post_create' %}">Create a new post</a>
     </p>
 
     {% if posts %}
@@ -16,12 +16,11 @@
             {% for post in posts %}
                 <li>
                     <strong>{{ post.title }}</strong>
-                    <p>Type: {{ post.type|capfirst }}</p>
-                    <p>Posted: {{ post.created_at|date:"M d, Y" }}</p>
+                    <p>Type: {{ post.get_type_display }}</p>
                     <p>Location: {{ post.location }}</p>
                     <p>Category: {{ post.category.name }}</p>
                     <p>Status: {{ post.status.name }}</p>
-                    <p><a href="{% url 'lost_found_post_detail' id=post.id %}">View details</a></p>
+                    <p><a href="{% url 'lost_found:post_detail' post_id=post.id %}">View details</a></p>
                 </li>
             {% endfor %}
         </ul>
