@@ -48,7 +48,7 @@ class UserProfile(models.Model):
     bio = models.TextField(blank=True)
     photo = models.OneToOneField(
         "media.Photo",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="profile",
         null=True,
         blank=True,

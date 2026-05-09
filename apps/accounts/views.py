@@ -7,6 +7,10 @@ from .forms import RegisterForm
 from .models import UserProfile
 from apps.skill_exchange.models import UserSkill, Skill
 from apps.academics.models import Department
+from apps.media.models import Photo
+
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+MAX_PHOTO_MB = 5
 
 
 def profile_view(request, handle):
@@ -32,17 +36,12 @@ def profile_view(request, handle):
 @login_required
 @require_POST
 def edit_profile(request, handle):
-    # Only the profile owner can edit
     if request.user.handle != handle:
         return JsonResponse({"error": "Forbidden"}, status=403)
 
-    try:
-        data = json.loads(request.body)
-    except (json.JSONDecodeError, ValueError):
-        return JsonResponse({"error": "Invalid request body"}, status=400)
-
     user = request.user
     profile = get_object_or_404(UserProfile, user=user)
+    data = request.POST
 
     # ── User fields ──────────────────────────────────────────────────────
     first_name = data.get("first_name", "").strip()
@@ -70,35 +69,59 @@ def edit_profile(request, handle):
     else:
         profile.department = None
 
-    profile.save(update_fields=["bio", "student_id", "department"])
+    # ── Photo ────────────────────────────────────────────────────────────
+    photo_file = request.FILES.get("photo")
+    photo_url = None
+    if photo_file:
+        if photo_file.content_type not in ALLOWED_IMAGE_TYPES:
+            return JsonResponse(
+                {"error": "Invalid file type. Use JPEG, PNG, WebP, or GIF."}, status=400
+            )
+        if photo_file.size > MAX_PHOTO_MB * 1024 * 1024:
+            return JsonResponse(
+                {"error": f"Photo too large. Maximum size is {MAX_PHOTO_MB} MB."},
+                status=400,
+            )
+        # SET_NULL means we can safely delete the old one now
+        if profile.photo:
+            old = profile.photo
+            profile.photo = None
+            old.delete()
+
+        new_photo = Photo.objects.create(file=photo_file, uploaded_by=user)
+        profile.photo = new_photo
+        photo_url = new_photo.file.url
+
+    profile.save(update_fields=["bio", "student_id", "department", "photo"])
 
     # ── Skills ───────────────────────────────────────────────────────────
-    skill_ids = data.get("skill_ids", [])
+    # FormData sends repeated keys: skill_ids=1&skill_ids=2&...
+    skill_ids = request.POST.getlist("skill_ids")
     valid_skills = Skill.objects.none()
-    if isinstance(skill_ids, list) and skill_ids:
+    if skill_ids:
         UserSkill.objects.filter(user=user).delete()
         valid_skills = Skill.objects.filter(id__in=skill_ids)
         UserSkill.objects.bulk_create(
             [UserSkill(user=user, skill=skill) for skill in valid_skills]
         )
-    elif isinstance(skill_ids, list):
-        # Empty list means the user cleared all skills
+    else:
         UserSkill.objects.filter(user=user).delete()
 
-    # Build the response payload so the JS can update the page without a reload
     dept = profile.department
-    return JsonResponse(
-        {
-            "success": True,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "bio": profile.bio,
-            "student_id": profile.student_id or "",
-            "department_id": dept.id if dept else "",
-            "department_name": f"{dept} ({dept.short_code})" if dept else "",
-            "skills": [{"id": s.id, "name": s.name} for s in valid_skills],
-        }
-    )
+    response = {
+        "success": True,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "bio": profile.bio,
+        "student_id": profile.student_id or "",
+        "department_id": dept.id if dept else "",
+        "department_name": f"{dept} ({dept.short_code})" if dept else "",
+        "skills": [{"id": s.id, "name": s.name} for s in valid_skills],
+    }
+    if photo_url:
+        response["photo_url"] = photo_url
+
+    return JsonResponse(response)
 
 
 @login_required

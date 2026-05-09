@@ -45,7 +45,7 @@
         <div class="profile-cover">
           <div class="profile-cover-pattern"></div>
           <div class="xp-cover-badge">
-            <span class="lvl">{{ profile.rank }}</span>
+            <span class="lvl">{{ profile.rank|default:"Unranked" }}</span>
             <span class="pts">{{ profile.total_xp }} XP</span>
           </div>
         </div>
@@ -53,15 +53,15 @@
         <div class="profile-info-row">
           <div class="profile-avatar-wrap">
             <div class="profile-avatar">
-              <span id="avatarInitials">
+              <img
+                id="avatarImg"
+                {% if profile.photo %}src="{{ profile.photo.file.url }}"{% endif %}
+                style="{% if not profile.photo %}display:none;{% endif %}"
+                alt="Profile picture"
+              />
+              <span id="avatarInitials" {% if profile.photo %}style="display:none"{% endif %}>
                 {{ profile.user.first_name|first }}{{ profile.user.last_name|first }}
               </span>
-
-              {% if profile.photo %}
-                <img src="{{ profile.photo.file.url }}" width="150" />
-              {% else %}
-                <p>No profile picture</p>
-              {% endif %}
             </div>
           </div>
 
@@ -160,6 +160,34 @@
       <div class="modal">
         <h2>✏️ Edit Profile</h2>
         <p class="msub">Update your profile information.</p>
+
+        <div class="fg">
+          <label>Profile Picture</label>
+          <div class="photo-upload-wrap">
+            <div class="photo-preview" id="e-photoPreview">
+              <img id="e-photoPreviewImg"
+                {% if profile.photo %}src="{{ profile.photo.file.url }}"{% endif %}
+                style="{% if not profile.photo %}display:none;{% endif %}"
+                alt=""
+              />
+              <span id="e-photoInitials" {% if profile.photo %}style="display:none"{% endif %}>
+                {{ profile.user.first_name|first }}{{ profile.user.last_name|first }}
+              </span>
+            </div>
+            <div class="photo-upload-right">
+              <label class="btn-choose-photo" for="e-photoInput">📷 Choose image</label>
+              <input
+                type="file"
+                id="e-photoInput"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                style="display:none"
+                onchange="previewPhoto(this)"
+              />
+              <p class="fg-hint">JPEG, PNG, WebP or GIF · max 5 MB</p>
+              <p class="photo-filename" id="e-photoFilename"></p>
+            </div>
+          </div>
+        </div>
 
         <div class="fg-row">
           <div class="fg">

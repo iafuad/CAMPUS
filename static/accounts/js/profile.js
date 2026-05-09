@@ -19,7 +19,22 @@ function clearNotifs() {
   notifications.innerHTML = '<div class="notif-empty">No notifications.</div>';
 }
 
-// ── Skills state: Map<id (string) → name> ─────────────────────────
+// ── Profile picture preview ────────────────────────────────────────
+function previewPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const img = document.getElementById('e-photoPreviewImg');
+  const initials = document.getElementById('e-photoInitials');
+  const filename = document.getElementById('e-photoFilename');
+
+  img.src = URL.createObjectURL(file);
+  img.style.display = '';
+  if (initials) initials.style.display = 'none';
+  if (filename) filename.textContent = file.name;
+}
+
+
 let selectedSkills = new Map();
 
 function renderSelectedChips() {
@@ -146,38 +161,44 @@ function closeEditModal() {
     modal.style.display = 'none';
     document.body.style.overflow = '';
   }
+  // Clear file input so re-opening doesn't show a stale selection
+  const photoInput = document.getElementById('e-photoInput');
+  if (photoInput) photoInput.value = '';
+  const filename = document.getElementById('e-photoFilename');
+  if (filename) filename.textContent = '';
 }
 
 async function saveProfile() {
   const saveBtn = document.getElementById('saveBtn');
   const errorBox = document.getElementById('editError');
 
-  const payload = {
-    first_name: document.getElementById('e-firstName').value.trim(),
-    last_name: document.getElementById('e-lastName').value.trim(),
-    student_id: document.getElementById('e-studentId').value.trim(),
-    department_id: document.getElementById('e-dept').value || null,
-    bio: document.getElementById('e-bio').value.trim(),
-    skill_ids: Array.from(selectedSkills.keys()).map((id) => parseInt(id)),
-  };
+  // Build FormData — required because we may be sending a file
+  const formData = new FormData();
+  formData.append('first_name', document.getElementById('e-firstName').value.trim());
+  formData.append('last_name', document.getElementById('e-lastName').value.trim());
+  formData.append('student_id', document.getElementById('e-studentId').value.trim());
+  formData.append('department_id', document.getElementById('e-dept').value || '');
+  formData.append('bio', document.getElementById('e-bio').value.trim());
+
+  // Repeated keys — Django reads these with request.POST.getlist('skill_ids')
+  selectedSkills.forEach((_name, id) => formData.append('skill_ids', id));
+
+  const photoFile = document.getElementById('e-photoInput')?.files[0];
+  if (photoFile) formData.append('photo', photoFile);
 
   if (saveBtn) {
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving…';
   }
-  if (errorBox) {
-    errorBox.style.display = 'none';
-  }
+  if (errorBox) errorBox.style.display = 'none';
 
   try {
     const url = document.getElementById('editUrl').dataset.url;
     const res = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCsrfToken(),
-      },
-      body: JSON.stringify(payload),
+      // No Content-Type header — browser sets it with the correct boundary for multipart
+      headers: { 'X-CSRFToken': getCsrfToken() },
+      body: formData,
     });
 
     const data = await res.json();
@@ -189,6 +210,7 @@ async function saveProfile() {
       return;
     }
 
+    // ── Update profile page without reload ──────────────────────────
     document.getElementById('displayName').textContent =
       data.first_name + ' ' + data.last_name;
     document.getElementById('v-firstName').textContent = data.first_name || '—';
@@ -196,6 +218,14 @@ async function saveProfile() {
     document.getElementById('v-studentId').textContent = data.student_id || 'Not set';
     document.getElementById('v-dept').textContent = data.department_name || 'Not set';
     document.getElementById('v-bio').textContent = data.bio || 'No bio added yet.';
+
+    if (data.photo_url) {
+      const avatarImg = document.getElementById('avatarImg');
+      avatarImg.src = data.photo_url;
+      avatarImg.style.display = '';
+      const initials = document.getElementById('avatarInitials');
+      if (initials) initials.style.display = 'none';
+    }
 
     const skillsWrap = document.getElementById('v-skills');
     if (skillsWrap) {
@@ -215,9 +245,7 @@ async function saveProfile() {
     }
 
     closeEditModal();
-    if (typeof showToast === 'function') {
-      showToast('✅ Profile saved!');
-    }
+    if (typeof showToast === 'function') showToast('✅ Profile saved!');
   } catch (err) {
     if (errorBox) {
       errorBox.textContent = 'Network error — please try again.';
