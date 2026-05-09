@@ -42,24 +42,31 @@ class User(AbstractUser):
     objects = UserManager()
 
 
-class Profile(models.Model):
+class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    student_id = models.IntegerField(unique=True, null=True, blank=True)
+    student_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
     bio = models.TextField(blank=True)
-    profile_picture = models.OneToOneField(
+    photo = models.OneToOneField(
         "media.Photo",
         on_delete=models.CASCADE,
-        related_name="profile_picture",
+        related_name="profile",
         null=True,
         blank=True,
+    )
+    total_xp = models.IntegerField(default=0)
+    rank = models.ForeignKey(
+        "rankings.UserRank", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    department = models.ForeignKey(
+        "academics.Department", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    admission_trimester = models.ForeignKey(
+        "academics.Trimester", on_delete=models.SET_NULL, null=True, blank=True
     )
     status = models.CharField(
         max_length=20,
         choices=ProfileStatus.choices,
         default=ProfileStatus.PENDING,
-    )
-    rank = models.ForeignKey(
-        "rankings.UserRank", on_delete=models.SET_NULL, null=True, blank=True
     )
     is_verified = models.BooleanField(default=False)
     is_graduated = models.BooleanField(default=False)

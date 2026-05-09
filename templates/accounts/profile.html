@@ -9,9 +9,9 @@
 
   <body>
     <nav>
-      <a class="logo"><span>campus</span></a>
+      <a class="logo"><span>CAMPUS</span></a>
       <div class="nav-right">
-        <a href="home.html" class="back-btn">← Back to Home</a>
+        <a href="{% url 'home' %}" class="back-btn">← Back to Home</a>
 
         <!-- Notification Bell -->
         <div class="notif-wrap">
@@ -22,16 +22,16 @@
           <div class="notif-dropdown" id="notifDropdown">
             <div class="notif-header">
               <span class="notif-header-title">Notifications</span>
-              <button class="notif-clear" onclick="clearNotifs()">
-                Clear all
-              </button>
+              <button class="notif-clear" onclick="clearNotifs()">Clear all</button>
             </div>
 
             <div class="notif-list" id="notifList">
-              {% if notifications %} {% for n in notifications %}
-              <div class="notif-item">{{ n.text }}</div>
-              {% endfor %} {% else %}
-              <div class="notif-empty">No notifications.</div>
+              {% if notifications %}
+                {% for n in notifications %}
+                  <div class="notif-item">{{ n.text }}</div>
+                {% endfor %}
+              {% else %}
+                <div class="notif-empty">No notifications.</div>
               {% endif %}
             </div>
           </div>
@@ -45,42 +45,37 @@
         <div class="profile-cover">
           <div class="profile-cover-pattern"></div>
           <div class="xp-cover-badge">
-            <span class="lvl">Level {{ profile.level|default:1 }}</span>
-            <span class="pts">{{ profile.xp|default:0 }} XP</span>
+            <span class="lvl">{{ profile.rank }}</span>
+            <span class="pts">{{ profile.total_xp }} XP</span>
           </div>
         </div>
 
         <div class="profile-info-row">
           <div class="profile-avatar-wrap">
-            <div
-              class="profile-avatar"
-              onclick="document.getElementById('avatarInput').click()"
-            >
+            <div class="profile-avatar">
               <span id="avatarInitials">
-                {{ user.first_name }} {{ user.last_name }}
+                {{ profile.user.first_name|first }}{{ profile.user.last_name|first }}
               </span>
 
-              {% if profile_user.profile.profile_picture %}
-              <img
-                src="{{ profile_user.profile.profile_picture.file.url }}"
-                width="150"
-              />
+              {% if profile.photo %}
+                <img src="{{ profile.photo.file.url }}" width="150" />
               {% else %}
-              <p>No profile picture</p>
+                <p>No profile picture</p>
               {% endif %}
             </div>
           </div>
 
           <div class="profile-details">
             <div class="profile-name" id="displayName">
-              {{ user.get_full_name|default:user.username }}
+              {{ profile.user.get_full_name|default:profile.user.handle }}
             </div>
-            <div class="profile-email" id="displayEmail">{{ user.email }}</div>
+            <div class="profile-email" id="displayEmail">{{ profile.user.email }}</div>
           </div>
 
-          <button class="btn-edit" onclick="openEditModal()">
-            ✏️ Edit Profile
-          </button>
+          {# Only the profile owner sees the Edit button #}
+          {% if is_own_profile %}
+            <button class="btn-edit" onclick="openEditModal()">✏️ Edit Profile</button>
+          {% endif %}
         </div>
       </div>
 
@@ -91,23 +86,17 @@
 
           <div class="info-row">
             <div class="info-label">First Name</div>
-            <div class="info-value" id="v-firstName">
-              {{ user.first_name|default:"—" }}
-            </div>
+            <div class="info-value" id="v-firstName">{{ profile.user.first_name|default:"—" }}</div>
           </div>
 
           <div class="info-row">
             <div class="info-label">Last Name</div>
-            <div class="info-value" id="v-lastName">
-              {{ user.last_name|default:"—" }}
-            </div>
+            <div class="info-value" id="v-lastName">{{ profile.user.last_name|default:"—" }}</div>
           </div>
 
           <div class="info-row">
             <div class="info-label">Email</div>
-            <div class="info-value" id="v-email">
-              {{ user.email|default:"—" }}
-            </div>
+            <div class="info-value" id="v-email">{{ profile.user.email|default:"—" }}</div>
           </div>
         </div>
 
@@ -117,9 +106,10 @@
           <div class="info-row">
             <div class="info-label">Student ID</div>
             <div class="info-value" id="v-studentId">
-              {% if profile_user.profile.student_id %} {{
-              profile_user.profile.student_id }} {% else %}
-              <span class="empty">Not set</span>
+              {% if profile.student_id %}
+                {{ profile.student_id }}
+              {% else %}
+                <span class="empty">Not set</span>
               {% endif %}
             </div>
           </div>
@@ -127,8 +117,10 @@
           <div class="info-row">
             <div class="info-label">Department</div>
             <div class="info-value" id="v-dept">
-              {% if profile.department %} {{ profile.department }} {% else %}
-              <span class="empty">Not set</span>
+              {% if profile.department %}
+                {{ profile.department }} ({{ profile.department.short_code }})
+              {% else %}
+                <span class="empty">Not set</span>
               {% endif %}
             </div>
           </div>
@@ -137,9 +129,10 @@
         <div class="info-card full">
           <div class="card-title"><span>📝</span> Bio</div>
           <div class="bio-text" id="v-bio">
-            {% if profile_user.profile.bio %} {{ profile_user.profile.bio }} {%
-            else %}
-            <span class="empty">No bio added yet.</span>
+            {% if profile.bio %}
+              {{ profile.bio }}
+            {% else %}
+              <span class="empty">No bio added yet.</span>
             {% endif %}
           </div>
         </div>
@@ -147,10 +140,12 @@
         <div class="info-card full">
           <div class="card-title"><span>⚡</span> Skills</div>
           <div class="skills-wrap" id="v-skills">
-            {% if profile.skills %} {% for skill in profile.skills %}
-            <span class="skill-tag">{{ skill }}</span>
-            {% endfor %} {% else %}
-            <span class="skill-tag empty-msg">No skills added yet.</span>
+            {% if skills %}
+              {% for skill in skills %}
+                <span class="skill-tag" data-id="{{ skill.id }}">{{ skill.name }}</span>
+              {% endfor %}
+            {% else %}
+              <span class="skill-tag empty-msg">No skills added yet.</span>
             {% endif %}
           </div>
         </div>
@@ -158,6 +153,9 @@
     </div>
 
     <!-- EDIT PROFILE MODAL -->
+    {# Hidden field so JS knows the edit endpoint URL #}
+    <span id="editUrl" data-url="{% url 'edit_profile' profile.user.handle %}" hidden></span>
+
     <div class="modal-overlay" id="editModal">
       <div class="modal">
         <h2>✏️ Edit Profile</h2>
@@ -166,68 +164,77 @@
         <div class="fg-row">
           <div class="fg">
             <label>First Name</label>
-            <input type="text" id="e-firstName" value="{{ user.first_name }}" />
+            <input type="text" id="e-firstName" />
           </div>
-
           <div class="fg">
             <label>Last Name</label>
-            <input type="text" id="e-lastName" value="{{ user.last_name }}" />
+            <input type="text" id="e-lastName" />
           </div>
-        </div>
-
-        <div class="fg">
-          <label>Email</label>
-          <input type="email" id="e-email" value="{{ user.email }}" />
         </div>
 
         <div class="fg-row">
           <div class="fg">
             <label>Student ID</label>
-            <input
-              type="text"
-              id="e-studentId"
-              value="{{ profile.student_id }}"
-            />
+            <input type="text" id="e-studentId" />
           </div>
 
           <div class="fg">
             <label>Department</label>
-            <input type="text" id="e-dept" value="{{ profile.department }}" />
+            {# Populated from the queryset passed by the view #}
+            <select id="e-dept">
+              <option value="">— Not set —</option>
+              {% for dept in all_departments %}
+                <option value="{{ dept.id }}"
+                  {% if profile.department.id == dept.id %}selected{% endif %}>
+                  {{ dept }} ({{ dept.short_code }})
+                </option>
+              {% endfor %}
+            </select>
           </div>
         </div>
 
         <div class="fg">
           <label>Bio</label>
-          <textarea id="e-bio">{{ profile_user.profile.bio }}</textarea>
+          <textarea id="e-bio"></textarea>
         </div>
 
         <div class="fg">
           <label>Skills</label>
-          <div class="skills-input-wrap">
-            <input
-              type="text"
-              id="e-skillInput"
-              placeholder="e.g. Python, UI Design..."
-              onkeydown="
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  addSkill();
-                }
-              "
-            />
-            <button class="btn-add-skill" onclick="addSkill()">+ Add</button>
+
+          {# Selected skills appear here as removable chips #}
+          <div class="selected-chips" id="e-selectedChips">
+            <span class="chips-placeholder" id="e-chipsPlaceholder">
+              None selected — pick from below
+            </span>
           </div>
 
-          <div class="skills-edit-wrap" id="e-skillsList">
-            {% if profile.skills %} {% for skill in profile.skills %}
-            <span class="skill-tag">{{ skill }}</span>
-            {% endfor %} {% endif %}
+          {# Search filters the pool below #}
+          <input
+            type="text"
+            id="e-skillSearch"
+            placeholder="Search available skills..."
+            oninput="filterSkills(this.value)"
+            autocomplete="off"
+          />
+
+          {# All available skills as clickable chips #}
+          <div class="skills-pool" id="e-skillsPool">
+            {% for skill in all_skills %}
+              <span
+                class="pool-chip"
+                data-id="{{ skill.id }}"
+                data-name="{{ skill.name }}"
+                onclick="addSkill(this)"
+              >{{ skill.name }}</span>
+            {% endfor %}
           </div>
         </div>
 
+        <div id="editError" class="edit-error" style="display:none;"></div>
+
         <div class="modal-btns">
           <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-          <button class="btn-submit" onclick="saveProfile()">
+          <button class="btn-submit" id="saveBtn" onclick="saveProfile()">
             Save Profile →
           </button>
         </div>
@@ -235,128 +242,193 @@
     </div>
 
     <script>
-      // Edit Profile Modal Open
-      function openEditModal() {
-        document.getElementById("editModal").style.display = "flex";
-        document.body.style.overflow = "hidden";
-
-        document.getElementById("e-firstName").value = document
-          .getElementById("v-firstName")
-          .textContent.trim()
-          .replace("—", "");
-        document.getElementById("e-lastName").value = document
-          .getElementById("v-lastName")
-          .textContent.trim()
-          .replace("—", "");
-        document.getElementById("e-email").value = document
-          .getElementById("v-email")
-          .textContent.trim()
-          .replace("—", "");
-        document.getElementById("e-studentId").value = document
-          .getElementById("v-studentId")
-          .textContent.trim()
-          .replace("Not set", "");
-        document.getElementById("e-dept").value = document
-          .getElementById("v-dept")
-          .textContent.trim()
-          .replace("Not set", "");
-        document.getElementById("e-bio").value = document
-          .getElementById("v-bio")
-          .textContent.trim()
-          .replace("No bio added yet.", "");
-
-        renderSkillTags();
+      // ── Helpers ────────────────────────────────────────────────────────
+      function getCsrfToken() {
+        return document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("csrftoken="))
+          ?.split("=")[1];
       }
 
-      // Edit Profile Modal Close
+      // ── Skills state: Map<id (string) → name> ─────────────────────────
+      let selectedSkills = new Map();
+
+      function renderSelectedChips() {
+        const container = document.getElementById("e-selectedChips");
+        const placeholder = document.getElementById("e-chipsPlaceholder");
+
+        // Clear existing chips, keep the placeholder node
+        container.querySelectorAll(".selected-chip").forEach((c) => c.remove());
+
+        if (selectedSkills.size === 0) {
+          placeholder.style.display = "";
+        } else {
+          placeholder.style.display = "none";
+          selectedSkills.forEach((name, id) => {
+            const chip = document.createElement("span");
+            chip.className = "selected-chip";
+            chip.dataset.id = id;
+            chip.innerHTML =
+              name +
+              `<button class="chip-remove" type="button" onclick="removeSkill('${id}')">×</button>`;
+            container.appendChild(chip);
+          });
+        }
+      }
+
+      function syncPoolChips() {
+        // Mark pool chips whose IDs are already selected
+        document.querySelectorAll(".pool-chip").forEach((chip) => {
+          chip.classList.toggle(
+            "pool-chip--selected",
+            selectedSkills.has(chip.dataset.id)
+          );
+        });
+      }
+
+      function addSkill(el) {
+        const id = el.dataset.id;
+        if (selectedSkills.has(id)) return;
+        selectedSkills.set(id, el.dataset.name);
+        el.classList.add("pool-chip--selected");
+        renderSelectedChips();
+      }
+
+      function removeSkill(id) {
+        selectedSkills.delete(id);
+        renderSelectedChips();
+        const poolChip = document.querySelector(`.pool-chip[data-id="${id}"]`);
+        if (poolChip) {
+          poolChip.classList.remove("pool-chip--selected");
+          // Respect whatever the search box currently says
+          const q = document.getElementById("e-skillSearch").value.toLowerCase();
+          if (q && !poolChip.dataset.name.toLowerCase().includes(q)) {
+            poolChip.style.display = "none";
+          }
+        }
+      }
+
+      function filterSkills(query) {
+        const q = query.toLowerCase();
+        document.querySelectorAll(".pool-chip").forEach((chip) => {
+          // Don't reveal already-selected chips via search
+          if (chip.classList.contains("pool-chip--selected")) return;
+          chip.style.display =
+            chip.dataset.name.toLowerCase().includes(q) ? "" : "none";
+        });
+      }
+
+      // ── Modal open / close ─────────────────────────────────────────────
+      function openEditModal() {
+        // Pre-fill text inputs from displayed values
+        document.getElementById("e-firstName").value = document
+          .getElementById("v-firstName").textContent.trim().replace("—", "");
+        document.getElementById("e-lastName").value = document
+          .getElementById("v-lastName").textContent.trim().replace("—", "");
+        document.getElementById("e-studentId").value = document
+          .getElementById("v-studentId").textContent.trim().replace("Not set", "");
+        document.getElementById("e-bio").value = document
+          .getElementById("v-bio").textContent.trim().replace("No bio added yet.", "");
+
+        // Seed selected skills from the profile page's skill tags
+        selectedSkills = new Map();
+        document.querySelectorAll("#v-skills .skill-tag[data-id]").forEach((tag) => {
+          selectedSkills.set(tag.dataset.id, tag.textContent.trim());
+        });
+
+        renderSelectedChips();
+        syncPoolChips();
+
+        // Reset search
+        const search = document.getElementById("e-skillSearch");
+        search.value = "";
+        filterSkills("");
+
+        document.getElementById("editError").style.display = "none";
+        document.getElementById("editModal").style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+
       function closeEditModal() {
         document.getElementById("editModal").style.display = "none";
         document.body.style.overflow = "";
       }
 
-      // ── SKILLS (DOM ) -using array js..This means that if you reload the page,
-      //  the skills will be gone.
-      // If you want to save permanently,
-      // you have to send it to the backend.
-      let skillsList = [];
+      // ── Save → POST to backend ─────────────────────────────────────────
+      async function saveProfile() {
+        const saveBtn = document.getElementById("saveBtn");
+        const errorBox = document.getElementById("editError");
 
-      window.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll("#v-skills .skill-tag").forEach((tag) => {
-          const text = tag.textContent.trim();
-          if (text && text !== "No skills added yet.") skillsList.push(text);
-        });
-      });
-
-      function renderSkillTags() {
-        const wrap = document.getElementById("e-skillsList");
-        wrap.innerHTML = "";
-        skillsList.forEach((skill, i) => {
-          const tag = document.createElement("span");
-          tag.className = "skill-edit-tag";
-          tag.innerHTML = `${skill} <button class="skill-remove" onclick="removeSkill(${i})">×</button>`;
-          wrap.appendChild(tag);
-        });
-      }
-
-      function addSkill() {
-        const input = document.getElementById("e-skillInput");
-        const val = input.value.trim();
-        if (!val) return;
-        if (!skillsList.includes(val)) skillsList.push(val);
-        input.value = "";
-        renderSkillTags();
-        input.focus();
-      }
-
-      function removeSkill(index) {
-        skillsList.splice(index, 1);
-        renderSkillTags();
-      }
-      // save profile
-      function saveProfile() {
-        const data = {
-          first_name: document.getElementById("e-firstName").value.trim(),
-          last_name: document.getElementById("e-lastName").value.trim(),
-          email: document.getElementById("e-email").value.trim(),
-          student_id: document.getElementById("e-studentId").value.trim(),
-          department: document.getElementById("e-dept").value.trim(),
-          bio: document.getElementById("e-bio").value.trim(),
-          skills: skillsList,
+        const payload = {
+          first_name:    document.getElementById("e-firstName").value.trim(),
+          last_name:     document.getElementById("e-lastName").value.trim(),
+          student_id:    document.getElementById("e-studentId").value.trim(),
+          department_id: document.getElementById("e-dept").value || null,
+          bio:           document.getElementById("e-bio").value.trim(),
+          skill_ids:     Array.from(selectedSkills.keys()).map((id) => parseInt(id)),
         };
 
-        // page update
-        document.getElementById("displayName").textContent =
-          data.first_name + " " + data.last_name;
-        document.getElementById("displayEmail").textContent = data.email;
-        document.getElementById("v-firstName").textContent =
-          data.first_name || "—";
-        document.getElementById("v-lastName").textContent =
-          data.last_name || "—";
-        document.getElementById("v-email").textContent = data.email || "—";
-        document.getElementById("v-studentId").textContent =
-          data.student_id || "Not set";
-        document.getElementById("v-dept").textContent =
-          data.department || "Not set";
-        document.getElementById("v-bio").textContent =
-          data.bio || "No bio added yet.";
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving…";
+        errorBox.style.display = "none";
 
-        // skills update
-        const wrap = document.getElementById("v-skills");
-        if (skillsList.length > 0) {
-          wrap.innerHTML = "";
-          skillsList.forEach(function (skill) {
-            const span = document.createElement("span");
-            span.className = "skill-tag";
-            span.textContent = skill;
-            wrap.appendChild(span);
+        try {
+          const url = document.getElementById("editUrl").dataset.url;
+          const res = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCsrfToken(),
+            },
+            body: JSON.stringify(payload),
           });
-        } else {
-          wrap.innerHTML =
-            '<span class="skill-tag empty-msg">No skills added yet.</span>';
-        }
 
-        closeEditModal();
-        showToast("✅ Profile saved!");
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            errorBox.textContent = data.error || "Something went wrong.";
+            errorBox.style.display = "block";
+            return;
+          }
+
+          // ── Update page without reload ──────────────────────────────
+          document.getElementById("displayName").textContent =
+            data.first_name + " " + data.last_name;
+          document.getElementById("v-firstName").textContent =
+            data.first_name || "—";
+          document.getElementById("v-lastName").textContent =
+            data.last_name || "—";
+          document.getElementById("v-studentId").textContent =
+            data.student_id || "Not set";
+          document.getElementById("v-dept").textContent =
+            data.department_name || "Not set";
+          document.getElementById("v-bio").textContent =
+            data.bio || "No bio added yet.";
+
+          const skillsWrap = document.getElementById("v-skills");
+          if (data.skills && data.skills.length > 0) {
+            skillsWrap.innerHTML = "";
+            data.skills.forEach((skill) => {
+              const span = document.createElement("span");
+              span.className = "skill-tag";
+              span.dataset.id = skill.id;
+              span.textContent = skill.name;
+              skillsWrap.appendChild(span);
+            });
+          } else {
+            skillsWrap.innerHTML =
+              '<span class="skill-tag empty-msg">No skills added yet.</span>';
+          }
+
+          closeEditModal();
+          showToast("✅ Profile saved!");
+        } catch (err) {
+          errorBox.textContent = "Network error — please try again.";
+          errorBox.style.display = "block";
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save Profile →";
+        }
       }
     </script>
   </body>
