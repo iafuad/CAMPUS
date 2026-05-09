@@ -6,11 +6,12 @@ from .models import (
     MatchDecision,
     SessionFeedback,
     Skill,
+    UserSkill,
 )
 
 admin.site.register(Skill)
 admin.site.register(ExchangePost)
-# admin.site.register(UserSkill)
+admin.site.register(UserSkill)
 admin.site.register(ExchangeMatch)
 admin.site.register(ExchangeSession)
 admin.site.register(SessionFeedback)
