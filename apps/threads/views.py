@@ -1,8 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
 from .models import Thread, ThreadMessage, MessageAttachment
 from apps.media.models import Photo
@@ -11,7 +11,10 @@ from apps.media.models import Photo
 # threads/views.py
 @login_required
 def thread_detail(request, thread_id):
+    # User can't view thread if not a participant
     thread = get_object_or_404(Thread, pk=thread_id)
+    if request.user not in thread.participants.all():
+        return HttpResponseForbidden("You are not a participant of this thread!")
 
     if request.method == "POST":
         content = request.POST.get("content", "").strip()
