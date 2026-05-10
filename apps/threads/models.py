@@ -72,7 +72,7 @@ class ThreadMessage(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"Message {self.id} in Thread {self.thread.id} by {self.sender.username}"
+        return f"Message {self.id} in Thread {self.thread.id} by {self.sender.email}"
 
 
 class MessageVote(models.Model):
