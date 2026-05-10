@@ -1,277 +1,163 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Profile</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}" />
-  </head>
+{% extends "base.html" %}
+{% load static %}
 
-  <body>
-    <nav>
-      <a class="logo"><span>CAMPUS</span></a>
-      <div class="nav-right">
-        <a href="{% url 'home' %}" class="back-btn">← Back to Home</a>
+{% block title %}{{ profile.user.get_full_name|default:profile.user.handle }} — Profile{% endblock %}
 
-        <!-- Notification Bell -->
-        <div class="notif-wrap">
-          <div class="notif-btn" onclick="toggleNotif()">
-            <span class="notif-icon">🔔</span>
-          </div>
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}">
+{% endblock %}
 
-          <div class="notif-dropdown" id="notifDropdown">
-            <div class="notif-header">
-              <span class="notif-header-title">Notifications</span>
-              <button class="notif-clear" onclick="clearNotifs()">Clear all</button>
-            </div>
+{% block content %}
 
-            <div class="notif-list" id="notifList">
-              {% if notifications %}
-                {% for n in notifications %}
-                  <div class="notif-item">{{ n.text }}</div>
-                {% endfor %}
-              {% else %}
-                <div class="notif-empty">No notifications.</div>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
+{# ── Profile header ────────────────────────────────────────── #}
+<div class="profile-header">
 
-    <div class="page">
-      <!-- PROFILE HEADER -->
-      <div class="profile-header">
-        <div class="profile-cover">
-          <div class="profile-cover-pattern"></div>
-          <div class="xp-cover-badge">
-            <span class="lvl">{{ profile.rank|default:"Unranked" }}</span>
-            <span class="pts">{{ profile.total_xp }} XP</span>
-          </div>
-        </div>
+  {# Cover strip with rank badge #}
+  <div class="profile-cover">
+    <div class="profile-cover-pattern"></div>
+    <div class="xp-cover-badge">
+      <span class="lvl">{{ profile.rank|default:"Unranked" }}</span>
+      <span class="pts">{{ profile.total_xp }} XP</span>
+    </div>
+  </div>
 
-        <div class="profile-info-row">
-          <div class="profile-avatar-wrap">
-            <div class="profile-avatar">
-              <img
-                id="avatarImg"
-                {% if profile.photo %}src="{{ profile.photo.file.url }}"{% endif %}
-                style="{% if not profile.photo %}display:none;{% endif %}"
-                alt="Profile picture"
-              />
-              <span id="avatarInitials" {% if profile.photo %}style="display:none"{% endif %}>
-                {{ profile.user.first_name|first }}{{ profile.user.last_name|first }}
-              </span>
-            </div>
-          </div>
+  {# Avatar + name row #}
+  <div class="profile-info-row">
 
-          <div class="profile-details">
-            <div class="profile-name" id="displayName">
-              {{ profile.user.get_full_name|default:profile.user.handle }}
-            </div>
-            <div class="profile-email" id="displayEmail">{{ profile.user.email }}</div>
-          </div>
-
-          {# Only the profile owner sees the Edit button #}
-          {% if is_own_profile %}
-            <button class="btn-edit" onclick="openEditModal()">✏️ Edit Profile</button>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- INFO CARDS -->
-      <div class="cards-grid">
-        <div class="info-card">
-          <div class="card-title"><span>👤</span> Basic Info</div>
-
-          <div class="info-row">
-            <div class="info-label">First Name</div>
-            <div class="info-value" id="v-firstName">{{ profile.user.first_name|default:"—" }}</div>
-          </div>
-
-          <div class="info-row">
-            <div class="info-label">Last Name</div>
-            <div class="info-value" id="v-lastName">{{ profile.user.last_name|default:"—" }}</div>
-          </div>
-
-          <div class="info-row">
-            <div class="info-label">Email</div>
-            <div class="info-value" id="v-email">{{ profile.user.email|default:"—" }}</div>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <div class="card-title"><span>🎓</span> Academic Info</div>
-
-          <div class="info-row">
-            <div class="info-label">Student ID</div>
-            <div class="info-value" id="v-studentId">
-              {% if profile.student_id %}
-                {{ profile.student_id }}
-              {% else %}
-                <span class="empty">Not set</span>
-              {% endif %}
-            </div>
-          </div>
-
-          <div class="info-row">
-            <div class="info-label">Department</div>
-            <div class="info-value" id="v-dept">
-              {% if profile.department %}
-                {{ profile.department }} ({{ profile.department.short_code }})
-              {% else %}
-                <span class="empty">Not set</span>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-
-        <div class="info-card full">
-          <div class="card-title"><span>📝</span> Bio</div>
-          <div class="bio-text" id="v-bio">
-            {% if profile.bio %}
-              {{ profile.bio }}
-            {% else %}
-              <span class="empty">No bio added yet.</span>
-            {% endif %}
-          </div>
-        </div>
-
-        <div class="info-card full">
-          <div class="card-title"><span>⚡</span> Skills</div>
-          <div class="skills-wrap" id="v-skills">
-            {% if skills %}
-              {% for skill in skills %}
-                <span class="skill-tag" data-id="{{ skill.id }}">{{ skill.name }}</span>
-              {% endfor %}
-            {% else %}
-              <span class="skill-tag empty-msg">No skills added yet.</span>
-            {% endif %}
-          </div>
-        </div>
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar">
+        <img
+          id="avatarImg"
+          {% if profile.photo %}src="{{ profile.photo.file.url }}"{% endif %}
+          style="{% if not profile.photo %}display:none;{% endif %}"
+          alt="Profile picture"
+        />
+        <span id="avatarInitials"
+              {% if profile.photo %}style="display:none"{% endif %}>
+          {{ profile.user.first_name|first|upper }}{{ profile.user.last_name|first|upper }}
+        </span>
       </div>
     </div>
 
-    <!-- EDIT PROFILE MODAL -->
-    {# Hidden field so JS knows the edit endpoint URL #}
-    <span id="editUrl" data-url="{% url 'edit_profile' profile.user.handle %}" hidden></span>
-
-    <div class="modal-overlay" id="editModal">
-      <div class="modal">
-        <h2>✏️ Edit Profile</h2>
-        <p class="msub">Update your profile information.</p>
-
-        <div class="fg">
-          <label>Profile Picture</label>
-          <div class="photo-upload-wrap">
-            <div class="photo-preview" id="e-photoPreview">
-              <img id="e-photoPreviewImg"
-                {% if profile.photo %}src="{{ profile.photo.file.url }}"{% endif %}
-                style="{% if not profile.photo %}display:none;{% endif %}"
-                alt=""
-              />
-              <span id="e-photoInitials" {% if profile.photo %}style="display:none"{% endif %}>
-                {{ profile.user.first_name|first }}{{ profile.user.last_name|first }}
-              </span>
-            </div>
-            <div class="photo-upload-right">
-              <label class="btn-choose-photo" for="e-photoInput">📷 Choose image</label>
-              <input
-                type="file"
-                id="e-photoInput"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                style="display:none"
-                onchange="previewPhoto(this)"
-              />
-              <p class="fg-hint">JPEG, PNG, WebP or GIF · max 5 MB</p>
-              <p class="photo-filename" id="e-photoFilename"></p>
-            </div>
-          </div>
-        </div>
-
-        <div class="fg-row">
-          <div class="fg">
-            <label>First Name</label>
-            <input type="text" id="e-firstName" />
-          </div>
-          <div class="fg">
-            <label>Last Name</label>
-            <input type="text" id="e-lastName" />
-          </div>
-        </div>
-
-        <div class="fg-row">
-          <div class="fg">
-            <label>Student ID</label>
-            <input type="text" id="e-studentId" />
-          </div>
-
-          <div class="fg">
-            <label>Department</label>
-            {# Populated from the queryset passed by the view #}
-            <select id="e-dept">
-              <option value="">— Not set —</option>
-              {% for dept in all_departments %}
-                <option value="{{ dept.id }}"
-                  {% if profile.department.id == dept.id %}selected{% endif %}>
-                  {{ dept }} ({{ dept.short_code }})
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <div class="fg">
-          <label>Bio</label>
-          <textarea id="e-bio"></textarea>
-        </div>
-
-        <div class="fg">
-          <label>Skills</label>
-
-          {# Selected skills appear here as removable chips #}
-          <div class="selected-chips" id="e-selectedChips">
-            <span class="chips-placeholder" id="e-chipsPlaceholder">
-              None selected — pick from below
-            </span>
-          </div>
-
-          {# Search filters the pool below #}
-          <input
-            type="text"
-            id="e-skillSearch"
-            placeholder="Search available skills..."
-            oninput="filterSkills(this.value)"
-            autocomplete="off"
-          />
-
-          {# Suggestion list — plain rows, fuzzy-filtered #}
-          <div class="skills-pool" id="e-skillsPool">
-            {% for skill in all_skills %}
-              <div
-                class="pool-item"
-                data-id="{{ skill.id }}"
-                data-name="{{ skill.name }}"
-                onclick="addSkill(this)"
-              >{{ skill.name }}</div>
-            {% endfor %}
-            <div class="pool-empty" id="e-poolEmpty" style="display:none;">
-              No matching skills
-            </div>
-          </div>
-        </div>
-
-        <div id="editError" class="edit-error" style="display:none;"></div>
-
-        <div class="modal-btns">
-          <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-          <button class="btn-submit" id="saveBtn" onclick="saveProfile()">
-            Save Profile →
-          </button>
-        </div>
+    <div class="profile-details">
+      <div class="profile-name">
+        {{ profile.user.get_full_name|default:profile.user.handle }}
       </div>
+      <div class="profile-email">{{ profile.user.email }}</div>
+      <div class="profile-handle">@{{ profile.user.handle }}</div>
     </div>
 
-    <script src="{% static 'accounts/js/profile.js' %}"></script>
-  </body>
-</html>
+    {% if is_own_profile %}
+      <a href="{% url 'edit_profile' profile.user.handle %}"
+         class="btn btn--outline btn--sm"
+         style="margin-left: auto; align-self: center;">
+        Edit Profile
+      </a>
+    {% endif %}
+
+  </div>
+</div>
+
+{# ── Info cards ────────────────────────────────────────────── #}
+<div class="cards-grid">
+
+  {# Basic Info #}
+  <div class="info-card">
+    <p class="card-title">Basic Info</p>
+
+    <div class="info-row">
+      <span class="info-label">First Name</span>
+      <span class="info-value">{{ profile.user.first_name|default:"—" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Last Name</span>
+      <span class="info-value">{{ profile.user.last_name|default:"—" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Email</span>
+      <span class="info-value">{{ profile.user.email }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Handle</span>
+      <span class="info-value">@{{ profile.user.handle }}</span>
+    </div>
+  </div>
+
+  {# Academic Info #}
+  <div class="info-card">
+    <p class="card-title">Academic Info</p>
+
+    <div class="info-row">
+      <span class="info-label">Student ID</span>
+      <span class="info-value">
+        {% if profile.student_id %}
+          {{ profile.student_id }}
+        {% else %}
+          <span class="empty">Not set</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Department</span>
+      <span class="info-value">
+        {% if profile.department %}
+          {{ profile.department }} ({{ profile.department.short_code }})
+        {% else %}
+          <span class="empty">Not set</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Admission</span>
+      <span class="info-value">
+        {% if profile.admission_trimester %}
+          {{ profile.admission_trimester }}
+        {% else %}
+          <span class="empty">Not set</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-value">
+        {% if profile.is_verified %}
+          <span class="badge badge--approved">Verified</span>
+        {% else %}
+          <span class="badge badge--pending">Unverified</span>
+        {% endif %}
+        {% if profile.is_graduated %}
+          <span class="badge badge--resolved" style="margin-left: 4px;">Graduated</span>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+  {# Bio #}
+  <div class="info-card full">
+    <p class="card-title">Bio</p>
+    <div class="bio-text">
+      {% if profile.bio %}
+        {{ profile.bio }}
+      {% else %}
+        <span class="empty">No bio added yet.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Skills #}
+  <div class="info-card full">
+    <p class="card-title">Skills</p>
+    <div class="skills-wrap">
+      {% if skills %}
+        {% for skill in skills %}
+          <span class="skill-tag">{{ skill.name }}</span>
+        {% endfor %}
+      {% else %}
+        <span class="skill-tag empty-msg">No skills added yet.</span>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
