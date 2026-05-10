@@ -1,50 +1,98 @@
-{% load static %}
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign Up</title>
-    <!-- CSS file -->
-    <link rel="stylesheet" href="{% static 'accounts/css/register.css' %}" />
-  </head>
-  <body>
-    <div class="card">
-      <h2>Create Account</h2>
+{% extends "base.html" %}
 
-      <!-- Django Form -->
-      <form method="POST">
-        {% csrf_token %}
+{% block title %}Sign Up — CAMPUS{% endblock %}
 
-        <input
-          type="text"
-          name="first_name"
-          placeholder="First Name"
-          required
-        />
-        <input type="text" name="last_name" placeholder="Last Name" required />
-        <input type="text" name="handle" placeholder="Username" required />
-        <input type="email" name="email" placeholder="Email" required />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          required
-        />
-        <input
-          type="password"
-          name="confirm_password"
-          placeholder="Confirm Password"
-          required
-        />
+{% block content %}
+<div style="max-width: 400px; margin: 48px auto;">
 
-        <button type="submit">Sign Up</button>
-      </form>
+  <div class="card" style="padding: 36px 36px 28px;">
 
-      <p>
-        Already have an account?
-        <a href="{% url 'login' %}">Login</a>
+    <div style="text-align: center; margin-bottom: 28px;">
+      <div style="
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px; height: 44px;
+        background: var(--orange-light);
+        border: 1.5px solid var(--orange-border);
+        border-radius: var(--radius-md);
+        margin-bottom: 14px;
+      ">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="var(--orange)" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/>
+          <line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+      </div>
+      <h1 style="font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.01em;">
+        Create an account
+      </h1>
+      <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">
+        Join your campus community
       </p>
     </div>
-  </body>
-</html>
+
+    <form method="POST" novalidate>
+      {% csrf_token %}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px;">
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input type="text" id="first_name" name="first_name"
+                 placeholder="Ada" required autocomplete="given-name" />
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input type="text" id="last_name" name="last_name"
+                 placeholder="Lovelace" required autocomplete="family-name" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="handle">Username</label>
+        <input type="text" id="handle" name="handle"
+               placeholder="@yourhandle" required autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email"
+               placeholder="you@university.edu" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="••••••••" required autocomplete="new-password" />
+      </div>
+
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password"
+               placeholder="••••••••" required autocomplete="new-password" />
+      </div>
+
+      {% if form.non_field_errors %}
+        <ul class="form-errors" style="margin-bottom: 14px;">
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <button type="submit" class="btn btn--primary" style="width: 100%; justify-content: center; margin-top: 4px;">
+        Create account
+      </button>
+    </form>
+
+    <p style="text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted);">
+      Already have an account?
+      <a href="{% url 'login' %}" style="font-weight: 500;">Log in</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

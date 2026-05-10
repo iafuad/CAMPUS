@@ -115,7 +115,7 @@
              id="id_student_id"
              name="student_id"
              value="{{ profile.student_id|default:'' }}"
-             placeholder="e.g. 2021-1-60-011">
+             placeholder="e.g. 0112410041">
     </div>
 
     <div class="form-group">
@@ -129,6 +129,14 @@
           </option>
         {% endfor %}
       </select>
+    </div>
+    <div class="form-group">
+      <label for="id_admission_trimester">Admission Trimester</label>
+      <input type="text"
+             id="id_admission_trimester"
+             name="admission_trimester"
+             value="{{ profile.admission_trimester|default:'' }}"
+             placeholder="e.g. 241">
     </div>
   </div>
 
