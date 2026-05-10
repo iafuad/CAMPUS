@@ -30,10 +30,10 @@ from apps.common.choices import ThreadVisibility, ThreadParticipantRole
 
 
 def post_list(request):
-    """All active (approved, not deleted) posts, newest first."""
+    """All active (active, not deleted) posts, newest first."""
     posts = (
         LostAndFoundPost.objects.filter(
-            status=LostAndFoundStatus.APPROVED,
+            status=LostAndFoundStatus.ACTIVE,
             deleted_at__isnull=True,
         )
         .select_related("category", "user")
@@ -134,7 +134,9 @@ def post_create(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
-            post.status = LostAndFoundStatus.APPROVED
+            post.status = (
+                LostAndFoundStatus.ACTIVE
+            )  # Auto-approve for simplicity; add moderation workflow as needed
             post.save()
 
             # Must call save_m2m() explicitly because we used commit=False.
@@ -181,14 +183,14 @@ def submit_claim(request, post_id):
       - Must be authenticated (decorator)
       - Cannot claim your own post
       - Cannot submit a duplicate claim (unique_together enforced + guard here)
-      - Post must be APPROVED and active
+      - Post must be ACTIVE and active
 
     Template: Reuses lost_found/post_detail.html with form errors inline.
     """
     post = get_object_or_404(
         LostAndFoundPost,
         pk=post_id,
-        status=LostAndFoundStatus.APPROVED,
+        status=LostAndFoundStatus.ACTIVE,
         deleted_at__isnull=True,
     )
 
@@ -283,7 +285,7 @@ def approve_claim(request, post_id, claim_id):
       6. Add both parties as ThreadParticipants.
 
     Only the found-post owner can call this.
-    Only works when the post is still APPROVED (not already resolved).
+    Only works when the post is still ACTIVE (not already resolved).
     """
     post = get_object_or_404(
         LostAndFoundPost,

@@ -5,7 +5,7 @@ from django.db import models
 # Lost and Found domain choices
 class LostAndFoundStatus(models.TextChoices):
     PENDING = "pending", "Pending"
-    APPROVED = "approved", "Approved"
+    ACTIVE = "active", "Active"
     REJECTED = "rejected", "Rejected"
     RESOLVED = "resolved", "Resolved"
 

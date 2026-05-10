@@ -62,7 +62,7 @@ class LostAndFoundPost(models.Model):
 
     @property
     def is_active(self):
-        return self.deleted_at is None and self.status == LostAndFoundStatus.APPROVED
+        return self.deleted_at is None and self.status == LostAndFoundStatus.ACTIVE
 
 
 class LostAndFoundPhoto(models.Model):
@@ -179,9 +179,9 @@ class ClaimThread(models.Model):
 # Auto-match suggestion
 #
 # Flow:
-#   1. A post is saved (APPROVED, not deleted) → matching.run_auto_match(post)
+#   1. A post is saved (ACTIVE, not deleted) → matching.run_auto_match(post)
 #      is called from the view after M2M tags are committed.
-#   2. Candidates: opposite type, same category, also approved + not deleted.
+#   2. Candidates: opposite type, same category, also active + not deleted.
 #   3. Score = number of shared tags. Skip if score == 0.
 #   4. SuggestedMatch created (or score updated if it already exists).
 #   5. TODO: notify lost_post.user — hook into notification system here.

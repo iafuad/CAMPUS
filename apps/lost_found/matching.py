@@ -22,9 +22,9 @@ from apps.common.choices import (
 
 
 def _active_posts():
-    """Base queryset: approved, not soft-deleted."""
+    """Base queryset: active, not soft-deleted."""
     return LostAndFoundPost.objects.filter(
-        status=LostAndFoundStatus.APPROVED,
+        status=LostAndFoundStatus.ACTIVE,
         deleted_at__isnull=True,
     )
 

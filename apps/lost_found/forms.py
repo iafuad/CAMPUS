@@ -114,7 +114,7 @@ class ClaimRequestForm(forms.ModelForm):
             self.fields["lost_post"].queryset = LostAndFoundPost.objects.filter(
                 user=user,
                 type=LostAndFoundPostType.LOST,
-                status=LostAndFoundStatus.APPROVED,
+                status=LostAndFoundStatus.ACTIVE,
                 deleted_at__isnull=True,
             ).order_by("-created_at")
         else:

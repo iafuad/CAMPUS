@@ -11,7 +11,7 @@ Register this module in your app config:
             import apps.lost_found.signals  # noqa: F401
 
 The signal below is intentionally lightweight: it only handles the edge case
-where a post transitions to APPROVED status outside of the normal create-view
+where a post transitions to ACTIVE status outside of the normal create-view
 flow (e.g., admin approval, a moderation action).
 
 For posts created through post_create or post_edit views, run_auto_match()
@@ -30,7 +30,7 @@ from apps.common.choices import LostAndFoundStatus
 @receiver(post_save, sender=LostAndFoundPost)
 def auto_match_on_approval(sender, instance, created, update_fields, **kwargs):
     """
-    Trigger auto-matching when a post reaches APPROVED status.
+    Trigger auto-matching when a post reaches ACTIVE status.
 
     Skipped when update_fields is specified and 'status' is not in it,
     to avoid running unnecessarily on every field-level save (e.g., soft deletes).
@@ -42,7 +42,7 @@ def auto_match_on_approval(sender, instance, created, update_fields, **kwargs):
     if update_fields and "status" not in update_fields:
         return
 
-    if instance.status == LostAndFoundStatus.APPROVED and not instance.deleted_at:
+    if instance.status == LostAndFoundStatus.ACTIVE and not instance.deleted_at:
         suggestions = run_auto_match(instance)
 
         # TODO — Notification hook for admin-approved posts:

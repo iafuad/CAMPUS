@@ -3,7 +3,7 @@
     <div>
       <p class="card__title">Claim handover details</p>
       <div class="card__meta">
-        <span class="badge badge--approved">{{ ctx.claim_request.get_status_display }}</span>
+        <span class="badge badge--active">{{ ctx.claim_request.get_status_display }}</span>
         <span>Claim #{{ ctx.claim_request.pk }}</span>
         <span>Claimer: {{ ctx.claim_request.claimer.get_full_name|default:ctx.claim_request.claimer.email }}</span>
       </div>

@@ -253,7 +253,7 @@ img { max-width: 100%; display: block; }
 .badge--found    { background: var(--green-light);  color: var(--green); }
 .badge--resolved { background: var(--gray-light);   color: var(--gray); }
 .badge--pending  { background: var(--amber-light);  color: var(--amber); }
-.badge--approved { background: var(--green-light);  color: var(--green); }
+.badge--active   { background: var(--green-light);  color: var(--green); }
 .badge--rejected { background: var(--red-light);    color: var(--red); }
 
 /* ── Card ──────────────────────────────────────────────────── */
