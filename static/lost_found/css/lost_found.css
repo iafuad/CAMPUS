@@ -3,57 +3,136 @@
    Requires campus.css (variables, reset, shared components).
    ============================================================ */
 
-/* ── Post list ─────────────────────────────────────────────── */
-.post-list { display: flex; flex-direction: column; gap: 10px; }
+/* ── Post grid ─────────────────────────────────────────────── */
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
 
 .post-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  overflow: hidden;
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  transition: border-color .15s, box-shadow .15s;
+  flex-direction: column;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+  text-decoration: none;
 }
 
 .post-card:hover {
   border-color: var(--orange-border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+  text-decoration: none;
 }
 
-.post-card__type {
+/* ── Cover image ───────────────────────────────────────────── */
+.post-card__cover {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--gray-light);
+  overflow: hidden;
   flex-shrink: 0;
-  padding-top: 2px;
 }
 
-.post-card__content { flex: 1; min-width: 0; }
+.post-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity .15s;
+}
+
+.post-card:hover .post-card__cover img { opacity: .92; }
+
+/* Placeholder shown when no image */
+.post-card__cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-light);
+}
+
+.post-card__cover-placeholder svg { opacity: .35; }
+
+.post-card__cover-placeholder span {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .03em;
+}
+
+/* Badge pinned to cover top-left */
+.post-card__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+/* Resolved ribbon across bottom of cover */
+.post-card__resolved {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,.45);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 5px 0;
+  backdrop-filter: blur(2px);
+}
+
+/* ── Card body ─────────────────────────────────────────────── */
+.post-card__body {
+  padding: 13px 15px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
 
 .post-card__title {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--text);
-  display: block;
-  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+
+.post-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.post-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.post-card__title:hover { color: var(--orange); text-decoration: none; }
+.post-card__meta-item svg { flex-shrink: 0; opacity: .6; }
 
-.post-card__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 5px;
-}
-
-.post-card__actions {
-  flex-shrink: 0;
-  padding-top: 2px;
+.post-card__footer {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
 }
 
 /* ── Detail layout ─────────────────────────────────────────── */
@@ -283,4 +362,31 @@
   margin-top: 22px;
   padding-top: 18px;
   border-top: 1px solid var(--border);
+}
+
+/* ── Filter bar ────────────────────────────────────────────── */
+.lf-filter-pill {
+  padding: 5px 13px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border-dark);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.lf-filter-pill:hover {
+  background: var(--orange-light);
+  color: var(--orange);
+  border-color: var(--orange-border);
+}
+
+.lf-filter-pill.active {
+  background: var(--orange-light);
+  color: var(--orange);
+  border-color: var(--orange-border);
+  font-weight: 600;
 }
