@@ -1,66 +1,201 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>{{ post.title }} - Lost & Found</title>
-  </head>
-  <body>
-    <h1>{{ post.title }}</h1>
+{% extends "lost_found/base.html" %}
 
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+
+{# ── Page header ──────────────────────────────────────────── #}
+<div class="lf-header">
+  <div class="lf-header__row">
     <div>
-      <h3>Details</h3>
-      <p><strong>Type:</strong> {{ post.get_type_display }}</p>
-      <p><strong>Category:</strong> {{ post.category.name }}</p>
-      <p><strong>Status:</strong> {{ post.get_status_display }}</p>
-      <p><strong>Location:</strong> {{ post.location }}</p>
-      <p><strong>Date:</strong> {{ post.lost_or_found_date }}</p>
-      <p><strong>Posted:</strong> {{ post.created_at|date:"M d, Y" }}</p>
+      {% if post.type == 'lost' %}
+        <span class="badge badge--lost" style="margin-bottom: 8px; display: inline-block;">Lost</span>
+      {% else %}
+        <span class="badge badge--found" style="margin-bottom: 8px; display: inline-block;">Found</span>
+      {% endif %}
+      <h1>{{ post.title }}</h1>
+    </div>
+    {% if user.is_authenticated and post.user == user and post.type == 'found' %}
+      <a href="{% url 'lost_found:review_claims' post_id=post.id %}" class="btn btn--outline btn--sm">
+        Review Claims
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="detail-grid">
+
+  {# ── Main column ────────────────────────────────────────── #}
+  <div>
+
+    {# Description #}
+    <div class="section">
+      <p class="section__label">Description</p>
+      <p style="font-size: 15px; line-height: 1.65; white-space: pre-wrap;">{{ post.description }}</p>
     </div>
 
-    <div>
-      <h3>Description</h3>
-      <p>{{ post.description }}</p>
-    </div>
-
-    {% if post.post_photos.all %}
-    <div>
-      <h3>Photos</h3>
-      <div>
-        {% for photo_entry in post.post_photos.all %}
-        <div style="display: inline-block; margin: 10px">
-          <img
-            src="{{ photo_entry.photo.file.url }}"
-            alt="{{ post.title }}"
-            style="max-width: 200px; max-height: 200px"
-          />
+    {# Photos #}
+    {% with photos=post.post_photos.all %}
+      {% if photos %}
+        <div class="section">
+          <p class="section__label">Photos</p>
+          <div class="photo-grid">
+            {% for entry in photos %}
+              <a href="{{ entry.photo.file.url }}" target="_blank">
+                <img src="{{ entry.photo.file.url }}" alt="{{ post.title }}">
+              </a>
+            {% endfor %}
+          </div>
         </div>
-        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {# Tags #}
+    {% if post.tags.exists %}
+      <div class="section">
+        <p class="section__label">Tags</p>
+        <div class="flex flex-gap-8" style="flex-wrap: wrap;">
+          {% for tag in post.tags.all %}
+            <span class="badge badge--pending">{{ tag.name }}</span>
+          {% endfor %}
+        </div>
       </div>
-    </div>
     {% endif %}
 
-    <div>
-      <h3>Posted By</h3>
-      <p>{{ post.user.email }}</p>
-    </div>
+    {# Claim section #}
+    <hr class="divider">
 
-    <div>
-      <h3>Submit a Claim</h3>
-      {% if user.is_authenticated %}
-      <form
-        method="post"
-        action="{% url 'lost_found:submit_claim' post_id=post.id %}"
-      >
-        {% csrf_token %} {{ claim_form.as_p }}
-        <button type="submit">Submit Claim</button>
-      </form>
-      {% else %}
-      <p>
-        <a href="{% url 'login' %}">Log in</a> to submit a claim for this item.
-      </p>
+    {% if user.is_authenticated %}
+
+      {% if post.user == user and post.type == 'found' %}
+        {# Owner sees link to their claim inbox #}
+        <div class="section">
+          <p class="section__label">Claims</p>
+          <p class="text-muted text-small">
+            You posted this item.
+            <a href="{% url 'lost_found:review_claims' post_id=post.id %}">View all claims →</a>
+          </p>
+        </div>
+
+      {% elif existing_claim %}
+        {# Already claimed #}
+        <div class="section">
+          <p class="section__label">Your Claim</p>
+          <div class="card">
+            <p class="text-small text-muted">
+              You submitted a claim on {{ existing_claim.created_at|date:"M d, Y" }}.
+              Status: <span class="badge badge--{{ existing_claim.status|lower }}">{{ existing_claim.get_status_display }}</span>
+            </p>
+            {% if existing_claim.status == 'approved' and existing_claim.claim_thread %}
+              <p class="text-small mt-8">
+                Your claim was approved.
+                <a href="{% url 'threads:thread_detail' thread_id=existing_claim.claim_thread.thread.id %}">
+                  Open the handover thread →
+                </a>
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+      {% elif claim_form %}
+        {# Claim form for eligible users #}
+        <div class="section">
+          <p class="section__label">Submit a Claim</p>
+          <div class="card">
+            <form method="post" action="{% url 'lost_found:submit_claim' post_id=post.id %}">
+              {% csrf_token %}
+
+              <div class="form-group">
+                <label for="{{ claim_form.lost_post.id_for_label }}">
+                  {{ claim_form.lost_post.label }}
+                </label>
+                {{ claim_form.lost_post }}
+                {% if claim_form.lost_post.help_text %}
+                  <p class="form-help">{{ claim_form.lost_post.help_text }}</p>
+                {% endif %}
+                {% if claim_form.lost_post.errors %}
+                  <ul class="form-errors">
+                    {% for e in claim_form.lost_post.errors %}<li>{{ e }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <div class="form-group">
+                <label for="{{ claim_form.message.id_for_label }}">
+                  {{ claim_form.message.label }}
+                </label>
+                {{ claim_form.message }}
+                {% if claim_form.message.errors %}
+                  <ul class="form-errors">
+                    {% for e in claim_form.message.errors %}<li>{{ e }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+
+              <button type="submit" class="btn btn--primary">Submit Claim</button>
+            </form>
+          </div>
+        </div>
       {% endif %}
+
+    {% else %}
+      <div class="section">
+        <p class="text-muted text-small">
+          <a href="{% url 'login' %}">Log in</a> to submit a claim for this item.
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+
+  {# ── Sidebar ────────────────────────────────────────────── #}
+  <div>
+    <div class="card">
+      <p class="section__label" style="margin-bottom: 0;">Details</p>
+      <dl class="detail-meta-list">
+
+        <div class="detail-meta-row">
+          <dt>Status</dt>
+          <dd>
+            <span class="badge badge--{{ post.status|lower }}">
+              {{ post.get_status_display }}
+            </span>
+          </dd>
+        </div>
+
+        <div class="detail-meta-row">
+          <dt>Category</dt>
+          <dd>{{ post.category.name }}</dd>
+        </div>
+
+        <div class="detail-meta-row">
+          <dt>Location</dt>
+          <dd>{{ post.location }}</dd>
+        </div>
+
+        <div class="detail-meta-row">
+          <dt>Date</dt>
+          <dd>{{ post.lost_or_found_date }}</dd>
+        </div>
+
+        <div class="detail-meta-row">
+          <dt>Posted by</dt>
+          <dd>{{ post.user.email }}</dd>
+        </div>
+
+        <div class="detail-meta-row">
+          <dt>Posted on</dt>
+          <dd>{{ post.created_at|date:"M d, Y" }}</dd>
+        </div>
+
+      </dl>
     </div>
 
-    <p><a href="{% url 'lost_found:post_list' %}">Back to Posts</a></p>
-  </body>
-</html>
+    <a href="{% url 'lost_found:post_list' %}" class="btn btn--ghost btn--sm" style="margin-top: 12px; width: 100%; justify-content: center;">
+      ← Back to Posts
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -7,12 +7,19 @@ class LostAndFoundStatus(models.TextChoices):
     PENDING = "pending", "Pending"
     APPROVED = "approved", "Approved"
     REJECTED = "rejected", "Rejected"
+    RESOLVED = "resolved", "Resolved"
 
 
-class LostAndFoundMatchStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
-    MATCHED = "matched", "Matched"
-    CLOSED = "closed", "Closed"
+# class LostAndFoundMatchStatus(models.TextChoices):
+#     PENDING = "pending", "Pending"
+#     MATCHED = "matched", "Matched"
+#     CLOSED = "closed", "Closed"
+
+
+class SuggestedMatchStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    DISMISSED = "DISMISSED", "Dismissed"
+    CONVERTED = "CONVERTED", "Converted"
 
 
 class ClaimRequestStatus(models.TextChoices):

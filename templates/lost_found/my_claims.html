@@ -1,27 +1,24 @@
 {% extends "lost_found/base.html" %}
 
-{% block title %}All Unresolved Posts{% endblock %}
+{% block title %}My Claims{% endblock %}
 
 {% block content %}
 <div class="lf-header">
   <div class="lf-header__row">
     <div>
       <h1>Lost &amp; Found</h1>
-      <p>Browse items lost or found on campus.</p>
+      <p>Browse all your claims.</p>
     </div>
-    {% if user.is_authenticated %}
-      <a href="{% url 'lost_found:post_create' %}" class="btn btn--primary">+ New Post</a>
-    {% endif %}
   </div>
 </div>
 
-{% if posts %}
+{% if claims %}
   <div class="post-list">
-    {% for post in posts %}
+    {% for claim in claims %}
       <div class="post-card">
 
         <div class="post-card__type">
-          {% if post.type == 'lost' %}
+          {% if claim.found_post.type == 'lost' %}
             <span class="badge badge--lost">Lost</span>
           {% else %}
             <span class="badge badge--found">Found</span>
@@ -29,21 +26,21 @@
         </div>
 
         <div class="post-card__content">
-          <a href="{% url 'lost_found:post_detail' post_id=post.id %}" class="post-card__title">
-            {{ post.title }}
+          <a href="{% url 'lost_found:post_detail' post_id=claim.found_post.id %}" class="post-card__title">
+            {{ claim.found_post.title }}
           </a>
           <div class="post-card__meta">
-            <span>{{ post.category.name }}</span>
-            <span>{{ post.location }}</span>
-            <span>{{ post.lost_or_found_date }}</span>
-            {% if post.status == 'resolved' %}
+            <span>{{ claim.found_post.category.name }}</span>
+            <span>{{ claim.found_post.location }}</span>
+            <span>{{ claim.found_post.lost_or_found_date }}</span>
+            {% if claim.found_post.status == 'resolved' %}
               <span class="badge badge--resolved">Resolved</span>
             {% endif %}
           </div>
         </div>
 
         <div class="post-card__actions">
-          <a href="{% url 'lost_found:post_detail' post_id=post.id %}" class="btn btn--ghost btn--sm">
+          <a href="{% url 'lost_found:post_detail' post_id=claim.found_post.id %}" class="btn btn--ghost btn--sm">
             View
           </a>
         </div>

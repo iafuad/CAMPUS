@@ -1,0 +1,107 @@
+{% extends "lost_found/base.html" %}
+
+{% block title %}Claims — {{ post.title }}{% endblock %}
+
+{% block content %}
+
+<div class="lf-header">
+  <div class="lf-header__row">
+    <div>
+      <h1>Claims</h1>
+      <p>
+        For: <a href="{% url 'lost_found:post_detail' post_id=post.id %}">{{ post.title }}</a>
+        &nbsp;·&nbsp; {{ claims|length }} claim{{ claims|length|pluralize }}
+      </p>
+    </div>
+    <span class="badge badge--{{ post.status|lower }}">{{ post.get_status_display }}</span>
+  </div>
+</div>
+
+{% if post.status == 'resolved' %}
+  <div class="message message--success" style="margin-bottom: 20px;">
+    This post has been resolved. An approved claim exists.
+  </div>
+{% endif %}
+
+{% if claims %}
+
+  {# ── Pending ─────────────────────────────────────────────── #}
+  {% with pending=claims|dictsort:"status" %}
+    {% for claim in claims %}
+      {% if claim.status == 'pending' %}
+
+        <div class="claim-card claim-card--pending">
+          <div class="claim-card__header">
+            <span class="claim-card__who">{{ claim.claimer.email }}</span>
+            <span class="claim-card__time">{{ claim.created_at|date:"M d, Y" }}</span>
+          </div>
+
+          <p class="claim-card__message">{{ claim.message }}</p>
+
+          {% if claim.lost_post %}
+            <div class="claim-card__lost-link">
+              Linked lost post:
+              <a href="{% url 'lost_found:post_detail' post_id=claim.lost_post.id %}">
+                {{ claim.lost_post.title }}
+              </a>
+              ({{ claim.lost_post.lost_or_found_date }})
+            </div>
+          {% endif %}
+
+          {% if post.status != 'resolved' %}
+            <div class="claim-card__actions">
+              <a href="{% url 'lost_found:approve_claim' post_id=post.id claim_id=claim.id %}"
+                 class="btn btn--primary btn--sm">
+                Approve
+              </a>
+            </div>
+          {% endif %}
+        </div>
+
+      {% endif %}
+    {% endfor %}
+  {% endwith %}
+
+  {# ── Approved / Rejected ─────────────────────────────────── #}
+  {% for claim in claims %}
+    {% if claim.status != 'pending' %}
+      <div class="claim-card claim-card--{{ claim.status|lower }}">
+        <div class="claim-card__header">
+          <div>
+            <span class="claim-card__who">{{ claim.claimer.email }}</span>
+            &nbsp;
+            <span class="badge badge--{{ claim.status|lower }}">{{ claim.get_status_display }}</span>
+          </div>
+          <span class="claim-card__time">{{ claim.created_at|date:"M d, Y" }}</span>
+        </div>
+
+        <p class="claim-card__message">{{ claim.message }}</p>
+
+        {% if claim.status == 'approved' %}
+          {% if claim.claim_thread %}
+            <div class="claim-card__actions">
+              <a href="{% url 'threads:thread_detail' thread_id=claim.claim_thread.thread.id %}"
+                 class="btn btn--outline btn--sm">
+                Open Handover Thread →
+              </a>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endfor %}
+
+{% else %}
+  <div class="empty">
+    <strong>No claims yet.</strong>
+    <p>No one has submitted a claim for this post.</p>
+  </div>
+{% endif %}
+
+<div style="margin-top: 20px;">
+  <a href="{% url 'lost_found:post_detail' post_id=post.id %}" class="btn btn--ghost btn--sm">
+    ← Back to Post
+  </a>
+</div>
+
+{% endblock %}

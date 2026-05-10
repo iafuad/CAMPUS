@@ -1,17 +1,14 @@
 {% extends "lost_found/base.html" %}
 
-{% block title %}All Unresolved Posts{% endblock %}
+{% block title %}My Posts{% endblock %}
 
 {% block content %}
 <div class="lf-header">
   <div class="lf-header__row">
     <div>
       <h1>Lost &amp; Found</h1>
-      <p>Browse items lost or found on campus.</p>
+      <p>Browse all your posts.</p>
     </div>
-    {% if user.is_authenticated %}
-      <a href="{% url 'lost_found:post_create' %}" class="btn btn--primary">+ New Post</a>
-    {% endif %}
   </div>
 </div>
 

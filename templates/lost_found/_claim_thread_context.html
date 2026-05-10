@@ -1,0 +1,32 @@
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card__header">
+    <div>
+      <p class="card__title">Claim handover details</p>
+      <div class="card__meta">
+        <span class="badge badge--approved">{{ ctx.claim_request.get_status_display }}</span>
+        <span>Claim #{{ ctx.claim_request.pk }}</span>
+        <span>Claimer: {{ ctx.claim_request.claimer.get_full_name|default:ctx.claim_request.claimer.email }}</span>
+      </div>
+    </div>
+    <a href="{% url 'lost_found:post_detail' post_id=ctx.claim_request.found_post.id %}"
+       class="btn btn--outline btn--sm">
+      View found post
+    </a>
+  </div>
+
+  <div class="card__body">
+    <p>
+      This thread is attached to an approved claim for the found item
+      <strong>{{ ctx.claim_request.found_post.title }}</strong>.
+    </p>
+
+    {% if ctx.claim_request.lost_post %}
+      <p>
+        Linked lost post:
+        <a href="{% url 'lost_found:post_detail' post_id=ctx.claim_request.lost_post.id %}">
+          {{ ctx.claim_request.lost_post.title }}
+        </a>
+      </p>
+    {% endif %}
+  </div>
+</div>

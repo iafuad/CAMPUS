@@ -1,0 +1,286 @@
+/* ============================================================
+   lost_found.css — Lost & Found specific styles only.
+   Requires campus.css (variables, reset, shared components).
+   ============================================================ */
+
+/* ── Post list ─────────────────────────────────────────────── */
+.post-list { display: flex; flex-direction: column; gap: 10px; }
+
+.post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.post-card:hover {
+  border-color: var(--orange-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.post-card__type {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.post-card__content { flex: 1; min-width: 0; }
+
+.post-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-card__title:hover { color: var(--orange); text-decoration: none; }
+
+.post-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+.post-card__actions {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+/* ── Detail layout ─────────────────────────────────────────── */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .detail-grid { grid-template-columns: 1fr; }
+}
+
+.detail-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.detail-meta-row {
+  display: flex;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.detail-meta-row:last-child { border-bottom: none; }
+
+.detail-meta-row dt {
+  width: 110px;
+  flex-shrink: 0;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.detail-meta-row dd { color: var(--text); }
+
+/* ── Photo grid ────────────────────────────────────────────── */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.photo-grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+
+.photo-grid img:hover { opacity: .85; }
+
+/* ── Photo preview (upload) ────────────────────────────────── */
+.photo-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.photo-preview img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* ── Claim card ────────────────────────────────────────────── */
+.claim-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+}
+
+.claim-card--approved { border-left: 3px solid var(--green); }
+.claim-card--rejected { border-left: 3px solid var(--border-dark); opacity: .65; }
+.claim-card--pending  { border-left: 3px solid var(--orange); }
+
+.claim-card + .claim-card { margin-top: 10px; }
+
+.claim-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.claim-card__who {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.claim-card__time {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.claim-card__message {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.claim-card__lost-link {
+  margin-top: 10px;
+  font-size: 13px;
+  padding: 8px 12px;
+  background: var(--orange-light);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.claim-card__lost-link a { font-weight: 500; }
+
+.claim-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Suggested match card ──────────────────────────────────── */
+.match-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.match-card + .match-card { margin-top: 10px; }
+
+.match-card__score {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: var(--orange-light);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--orange);
+  line-height: 1;
+}
+
+.match-card__score-label {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--orange-hover);
+  margin-top: 2px;
+}
+
+.match-card__content { flex: 1; min-width: 0; }
+
+.match-card__title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.match-card__meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.match-card__actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Confirm box ───────────────────────────────────────────── */
+.confirm-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 28px 30px;
+}
+
+.confirm-box__title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.confirm-box__warning {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.confirm-box__warning ul {
+  margin-top: 8px;
+  padding-left: 18px;
+}
+
+.confirm-box__warning ul li { margin-top: 4px; }
+
+.confirm-box__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
