@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{# ── Lost & Found styles ──────────────────────────────────────
+   Loads lost_found.css on top of the global campus.css that
+   base.html already provides.
+#}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'lost_found/css/lost_found.css' %}">
+{% endblock %}
+
+{# ── Lost & Found sub-navigation ─────────────────────────────
+   Renders a thin strip below the global nav with L&F-specific
+   links. All lost_found templates continue to extend this file
+   exactly as before — nothing else changes for them.
+#}
+{% block subnav %}
+<div class="campus-subnav">
+  <div class="campus-subnav__inner">
+
+    <a href="{% url 'lost_found:post_list' %}"
+       {% if request.resolver_match.url_name == 'post_list' %}class="active"{% endif %}>
+      All Posts
+    </a>
+
+    {% if user.is_authenticated %}
+      <div class="subnav-divider"></div>
+      <a href="{% url 'lost_found:my_posts' %}"
+         {% if request.resolver_match.url_name == 'my_posts' %}class="active"{% endif %}>
+        My Posts
+      </a>
+      <a href="{% url 'lost_found:my_claims' %}"
+         {% if request.resolver_match.url_name == 'my_claims' %}class="active"{% endif %}>
+        My Claims
+      </a>
+      <a href="{% url 'lost_found:my_suggested_matches' %}"
+         {% if request.resolver_match.url_name == 'my_suggested_matches' %}class="active"{% endif %}>
+        My Matches
+      </a>
+      <div class="subnav-divider"></div>
+      <a href="{% url 'lost_found:post_create' %}"
+         {% if request.resolver_match.url_name == 'post_create' %}class="active"{% endif %}>
+        + New Post
+      </a>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

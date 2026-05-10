@@ -1,0 +1,282 @@
+/* ============================================================
+   Threads — threads.css
+   Loaded on top of campus.css, which defines all root
+   variables (--orange, --surface, --border, etc.).
+   Only thread-specific rules live here.
+   ============================================================ */
+
+/* ── Message list container ────────────────────────────────── */
+.threads-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.threads-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.threads-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.threads-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Message feed ──────────────────────────────────────────── */
+.threads-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 0;
+
+  /* Constrained scroll area so the compose box stays in view */
+  max-height: 55vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* A single message row */
+.threads-message {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  /* default = other person's message, left side */
+}
+
+/* Own message — flip the whole row */
+.threads-message--own {
+  flex-direction: row-reverse;
+}
+
+/* ── Avatar ────────────────────────────────────────────────── */
+.threads-message__avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--orange-light);
+  color: var(--orange);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* letter-initial fallback used when the element is a <div> */
+  user-select: none;
+}
+
+/* Own messages: no avatar needed — space reserved so bubbles
+   don't stretch edge-to-edge */
+.threads-message--own .threads-message__avatar {
+  visibility: hidden;
+}
+
+/* ── Bubble wrapper ────────────────────────────────────────── */
+.threads-message__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 68%;
+  width: fit-content;
+}
+
+.threads-message--own .threads-message__body {
+  align-items: flex-end;
+}
+
+/* ── Sender name + timestamp ───────────────────────────────── */
+.threads-message__meta {
+  font-size: 11.5px;
+  color: var(--text-light);
+  padding: 0 4px;
+}
+
+/* ── Bubble ────────────────────────────────────────────────── */
+.threads-message__bubble {
+  padding: 9px 13px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+/* Other person */
+.threads-message--other .threads-message__bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-bottom-left-radius: 4px;   /* small tail toward avatar */
+}
+
+/* Own message */
+.threads-message--own .threads-message__bubble {
+  background: var(--orange);
+  color: #fff;
+  border-bottom-right-radius: 4px;  /* tail on own side */
+}
+
+/* ── Attachments inside a bubble ───────────────────────────── */
+.threads-message__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.threads-message__attachments a {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.threads-message__attachments img {
+  display: block;
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  transition: opacity .15s;
+}
+
+.threads-message__attachments img:hover { opacity: .85; }
+
+/* Own-bubble attachments: invert border tint */
+.threads-message--own .threads-message__attachments a {
+  border-color: rgba(255,255,255,.25);
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+.threads-empty {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/* ── Compose area ──────────────────────────────────────────── */
+.threads-compose {
+  border-top: 1px solid var(--border);
+  padding: 14px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Photo preview strip — populated by JS */
+.threads-compose__preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.threads-compose__preview-item {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.threads-compose__preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: block;
+}
+
+/* Inline ✕ remove button on each preview image */
+.threads-compose__preview-remove {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text);
+  color: #fff;
+  font-size: 10px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  padding: 0;
+}
+
+/* Textarea */
+.threads-compose__textarea {
+  display: block;
+  width: 100%;
+  min-height: 72px;
+  max-height: 180px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color .15s;
+  line-height: 1.5;
+}
+
+.threads-compose__textarea:focus {
+  border-color: var(--orange);
+}
+
+/* Toolbar: attach button left, send button right */
+.threads-compose__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.threads-compose__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The real <input type="file"> is hidden;
+   this label acts as the visible attach button */
+.threads-attach-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+  user-select: none;
+}
+
+.threads-attach-label:hover {
+  background: var(--gray-light, #F0F0F0);
+  border-color: var(--border-dark);
+  color: var(--text);
+}
+
+.threads-attach-label svg {
+  flex-shrink: 0;
+}
+
+/* File count badge — shown by JS next to the label */
+.threads-attach-count {
+  font-size: 12px;
+  color: var(--orange);
+  font-weight: 600;
+}

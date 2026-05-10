@@ -1,0 +1,60 @@
+{% extends "lost_found/base.html" %}
+
+{% block title %}Approve Claim{% endblock %}
+
+{% block content %}
+
+<div class="lf-header">
+  <div class="lf-header__row">
+    <h1>Approve Claim</h1>
+  </div>
+</div>
+
+<div class="confirm-box">
+
+  <p class="confirm-box__title">Approve this claim?</p>
+
+  <p class="confirm-box__warning">
+    You are about to approve the claim submitted by
+    <strong>{{ claim.claimer.email }}</strong>.
+  </p>
+
+  {# Claim summary #}
+  <div class="card" style="margin-bottom: 16px;">
+    <p class="text-small text-muted" style="margin-bottom: 6px;">Their message:</p>
+    <p style="font-size: 14px; white-space: pre-wrap;">{{ claim.message }}</p>
+    {% if claim.lost_post %}
+      <p class="text-small text-muted" style="margin-top: 10px;">
+        Linked lost post:
+        <a href="{% url 'lost_found:post_detail' post_id=claim.lost_post.id %}">{{ claim.lost_post.title }}</a>
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="confirm-box__warning">
+    This action will:
+    <ul>
+      <li>Mark this claim as <strong>Approved</strong></li>
+      <li>Reject all other pending claims on this post</li>
+      <li>Mark <strong>{{ post.title }}</strong> as Resolved</li>
+      {% if claim.lost_post %}
+        <li>Mark <strong>{{ claim.lost_post.title }}</strong> as Resolved</li>
+      {% endif %}
+      <li>Open a private thread between you and the claimer for handover</li>
+    </ul>
+    <p style="margin-top: 10px; font-weight: 500;">This cannot be undone.</p>
+  </div>
+
+  <div class="confirm-box__actions">
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn--primary">Yes, Approve</button>
+    </form>
+    <a href="{% url 'lost_found:review_claims' post_id=post.id %}" class="btn btn--ghost">
+      Cancel
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

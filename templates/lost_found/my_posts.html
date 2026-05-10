@@ -1,13 +1,13 @@
 {% extends "lost_found/base.html" %}
 {% load static %}
-{% block title %}All Unresolved Posts{% endblock %}
+{% block title %}My Posts{% endblock %}
 
 {% block content %}
 <div class="lf-header">
   <div class="lf-header__row">
     <div>
       <h1>Lost &amp; Found</h1>
-      <p>Browse items lost or found on campus~</p>
+      <p>Browse all your posts~</p>
     </div>
     {% if user.is_authenticated %}
       <a href="{% url 'lost_found:post_create' %}" class="btn btn--primary">+ New Post</a>
@@ -35,6 +35,16 @@
     {% for post in posts %}
       <option value="{{ post.category.name|slugify }}">{{ post.category.name }}</option>
     {% endfor %}
+  </select>
+
+  {# Status #}
+  <select class="lf-filter-select" data-filter="status" style="
+    padding: 5px 10px; border-radius: var(--radius);
+    border: 1.5px solid var(--border-dark); background: var(--surface);
+    color: var(--text); font-size: 13px; font-family: inherit; cursor: pointer;">
+    <option value="all">Any Status</option>
+    <option value="active">Active</option>
+    <option value="resolved">Resolved</option>
   </select>
 
   {# Result count #}

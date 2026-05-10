@@ -1,72 +1,29 @@
 {% extends "lost_found/base.html" %}
-{% load static %}
-{% block title %}All Unresolved Posts{% endblock %}
+
+{% block title %}Your Claims{% endblock %}
 
 {% block content %}
 <div class="lf-header">
   <div class="lf-header__row">
     <div>
       <h1>Lost &amp; Found</h1>
-      <p>Browse items lost or found on campus~</p>
+      <p>Browse all your claims~</p>
     </div>
-    {% if user.is_authenticated %}
-      <a href="{% url 'lost_found:post_create' %}" class="btn btn--primary">+ New Post</a>
-    {% endif %}
   </div>
 </div>
 
-<div class="lf-filter-bar" id="filterBar" style="
-  display: flex; flex-wrap: wrap; align-items: center;
-  gap: 8px; margin-bottom: 20px;">
-
-  {# Type pills #}
-  <div style="display:flex; gap:6px;">
-    <button class="lf-filter-pill active" data-filter="type" data-value="all">All</button>
-    <button class="lf-filter-pill" data-filter="type" data-value="lost">Lost</button>
-    <button class="lf-filter-pill" data-filter="type" data-value="found">Found</button>
-  </div>
-
-  {# Category dropdown — built from actual posts #}
-  <select class="lf-filter-select" data-filter="category" style="
-    padding: 5px 10px; border-radius: var(--radius);
-    border: 1.5px solid var(--border-dark); background: var(--surface);
-    color: var(--text); font-size: 13px; font-family: inherit; cursor: pointer;">
-    <option value="all">All Categories</option>
-    {% for post in posts %}
-      <option value="{{ post.category.name|slugify }}">{{ post.category.name }}</option>
-    {% endfor %}
-  </select>
-
-  {# Result count #}
-  <span id="filterCount" style="font-size: 13px; color: var(--text-muted);"></span>
-
-  {# Sort #}
-  <select class="lf-filter-select" data-filter="sort" style="
-    padding: 5px 10px; border-radius: var(--radius);
-    border: 1.5px solid var(--border-dark); background: var(--surface);
-    color: var(--text); font-size: 13px; font-family: inherit; cursor: pointer;
-    margin-left: auto;">
-    <option value="newest">Newest First</option>
-    <option value="oldest">Oldest First</option>
-  </select>
-</div>
-
-{% if posts %}
+{% if claims %}
   <div class="post-grid">
-    {% for post in posts %}
+    {% for claim in claims %}
 
-      <a href="{% url 'lost_found:post_detail' post_id=post.id %}"
-        class="post-card"
-        data-type="{{ post.type }}"
-        data-category="{{ post.category.name|slugify }}"
-        data-status="{{ post.status }}">
+      <a href="{% url 'lost_found:post_detail' post_id=claim.found_post.id %}" class="post-card">
 
         {# ── Cover ── #}
         <div class="post-card__cover">
 
-          {% with cover=post.post_photos.first %}
+          {% with cover=claim.found_post.post_photos.first %}
             {% if cover %}
-              <img src="{{ cover.photo.file.url }}" alt="{{ post.title }}" loading="lazy" />
+              <img src="{{ cover.photo.file.url }}" alt="{{ claim.title }}" loading="lazy" />
             {% else %}
               <div class="post-card__cover-placeholder">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
@@ -83,7 +40,7 @@
 
           {# Lost / Found badge #}
           <div class="post-card__badge">
-            {% if post.type == 'lost' %}
+            {% if claim.found_post.type == 'lost' %}
               <span class="badge badge--lost">Lost</span>
             {% else %}
               <span class="badge badge--found">Found</span>
@@ -91,7 +48,7 @@
           </div>
 
           {# Resolved ribbon #}
-          {% if post.status == 'resolved' %}
+          {% if claim.found_post.status == 'resolved' %}
             <div class="post-card__resolved">Resolved</div>
           {% endif %}
 
@@ -100,7 +57,7 @@
         {# ── Body ── #}
         <div class="post-card__body">
 
-          <div class="post-card__title">{{ post.title }}</div>
+          <div class="post-card__title">{{ claim.found_post.title }}</div>
 
           <div class="post-card__meta">
             <div class="post-card__meta-item">
@@ -109,7 +66,7 @@
                    stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 6h16M4 12h16M4 18h7"/>
               </svg>
-              {{ post.category.name }}
+              {{ claim.found_post.category.name }}
             </div>
             <div class="post-card__meta-item">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -118,7 +75,7 @@
                 <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
-              {{ post.location }}
+              {{ claim.found_post.location }}
             </div>
             <div class="post-card__meta-item">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -129,7 +86,7 @@
                 <line x1="8" y1="2" x2="8" y2="6"/>
                 <line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
-              {{ post.lost_or_found_date }}
+              {{ claim.found_post.lost_or_found_date }}
             </div>
           </div>
 
@@ -149,17 +106,13 @@
 {% else %}
   <div class="empty">
     <strong>No posts yet.</strong>
-    <p>Be the first to report a lost or found item.</p>
+    <p>You haven't made any claims yet.</p>
     {% if user.is_authenticated %}
-      <a href="{% url 'lost_found:post_create' %}" class="btn btn--primary" style="margin-top: 16px;">
-        Create a Post
+      <a href="{% url 'lost_found:post_list' %}" class="btn btn--primary" style="margin-top: 16px;">
+        Browse Posts
       </a>
     {% endif %}
   </div>
 {% endif %}
 
-{% endblock %}
-
-{% block extra_js %}
-  <script src="{% static 'lost_found/js/post_list.js' %}"></script>
 {% endblock %}

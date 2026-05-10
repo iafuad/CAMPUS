@@ -25,6 +25,7 @@ from campus.views import home
 urlpatterns = [
     path("", home, name="home"),
     path("", include("apps.accounts.urls")),
+    path("threads/", include("apps.threads.urls")),
     path("admin/", admin.site.urls),
     path("forum/", include("apps.forum.urls")),
     path("lost-found/", include("apps.lost_found.urls")),

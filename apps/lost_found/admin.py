@@ -3,14 +3,16 @@ from .models import (
     LostAndFoundCategory,
     LostAndFoundPost,
     LostAndFoundPhoto,
+    LostAndFoundTag,
     ClaimRequest,
-    LostAndFoundMatch,
+    SuggestedMatch,
     ClaimThread,
 )
 
 admin.site.register(LostAndFoundCategory)
 admin.site.register(LostAndFoundPost)
 admin.site.register(LostAndFoundPhoto)
+admin.site.register(LostAndFoundTag)
 admin.site.register(ClaimRequest)
-admin.site.register(LostAndFoundMatch)
+admin.site.register(SuggestedMatch)
 admin.site.register(ClaimThread)
