@@ -114,7 +114,9 @@ class ThreadParticipant(models.Model):
     )
 
     role = models.CharField(
-        max_length=50, choices=ThreadParticipantRole.choices, default="MEMBER"
+        max_length=50,
+        choices=ThreadParticipantRole.choices,
+        default=ThreadParticipantRole.MEMBER,
     )
     joined_at = models.DateTimeField(auto_now_add=True)
 

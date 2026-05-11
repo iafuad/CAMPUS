@@ -15,6 +15,7 @@ from .forms import LostAndFoundPostForm, ClaimRequestForm
 from .matching import run_auto_match
 
 from apps.common.choices import (
+    LostAndFoundPostType,
     LostAndFoundStatus,
     ClaimRequestStatus,
     SuggestedMatchStatus,
@@ -102,7 +103,11 @@ def post_detail(request, post_id):
     claim_form = None
     existing_claim = None
 
-    if request.user.is_authenticated and post.user != request.user:
+    if (
+        request.user.is_authenticated
+        and post.user != request.user
+        and post.type == LostAndFoundPostType.FOUND
+    ):
         existing_claim = ClaimRequest.objects.filter(
             claimer=request.user, found_post=post
         ).first()
