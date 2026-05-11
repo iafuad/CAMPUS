@@ -15,7 +15,7 @@
       <h1>Edit Profile</h1>
       <p>Update your information and skills.</p>
     </div>
-    <a href="{% url 'profile' handle=profile.user.handle %}" class="btn btn--ghost btn--sm">
+    <a href="{% url 'accounts:profile' handle=profile.user.handle %}" class="btn btn--ghost btn--sm">
       ← Back to Profile
     </a>
   </div>
@@ -33,7 +33,7 @@
 <div style="max-width: 560px;">
 <form method="post"
       enctype="multipart/form-data"
-      action="{% url 'edit_profile' profile.user.handle %}"
+      action="{% url 'accounts:edit_profile' profile.user.handle %}"
       novalidate>
   {% csrf_token %}
 
@@ -208,7 +208,7 @@
 
   <div class="flex flex-gap-8">
     <button type="submit" class="btn btn--primary">Save Changes</button>
-    <a href="{% url 'profile' handle=profile.user.handle %}"
+    <a href="{% url 'accounts:profile' handle=profile.user.handle %}"
        class="btn btn--ghost">Cancel</a>
   </div>
 
