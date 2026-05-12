@@ -34,8 +34,8 @@
       {# Five platform features #}
       <ul class="lf-nav__links" style="flex: 1; justify-content: center;">
         <li>
-          <a href="#"
-             {% if request.resolver_match.app_name == 'skills' %}class="active"{% endif %}>
+          <a href="{% url 'skill_exchange:post_list' %}"
+             {% if request.resolver_match.app_name == 'skill_exchange' %}class="active"{% endif %}>
             Skill Exchange
           </a>
         </li>
