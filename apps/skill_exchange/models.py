@@ -5,6 +5,7 @@ from apps.common.choices import (
     ExchangeMatchStatus,
     ExchangeSessionStatus,
     SessionFeedbackStatus,
+    SessionEndRequestStatus,
     MatchDecisionStatus,
 )
 
@@ -23,7 +24,7 @@ class UserSkill(models.Model):
     # proficiency_notes = models.TextField(null=True, blank=True)
     # years_experience = models.DecimalField(
     #     max_digits=4, decimal_places=1, null=True, blank=True
-    # )
+    #)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -83,6 +84,8 @@ class ExchangeMatch(models.Model):
         return (
             f"Match {self.id} between Post {self.ex_p_a.id} and Post {self.ex_p_b.id}"
         )
+    class Meta:
+        unique_together = ('ex_p_a', 'ex_p_b')
 
 
 class ExchangeSession(models.Model):
@@ -145,3 +148,32 @@ class MatchDecision(models.Model):
 
     def __str__(self):
         return f"Decision {self.id} by {self.decided_by.email} for Match {self.exchange_match.id}"
+
+
+class SessionEndRequest(models.Model):
+    """Track session end requests - both users must agree to end a session"""
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="session_end_requests_made",
+    )
+    exchange_session = models.ForeignKey(
+        ExchangeSession,
+        on_delete=models.CASCADE,
+        related_name="end_requests",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=SessionEndRequestStatus.choices,
+        default=SessionEndRequestStatus.PENDING,
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"End Request {self.id} for Session {self.exchange_session.id} by {self.requested_by.email}"
+
+    class Meta:
+        # Only one pending end request per session
+        unique_together = ('exchange_session', 'status')
+

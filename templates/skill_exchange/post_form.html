@@ -1,0 +1,69 @@
+{% extends "skill_exchange/base.html" %}
+{% block title %}New Skill Exchange Post{% endblock %}
+
+{% block content %}
+<div class="lf-wrap">
+
+  <div class="lf-header">
+    <div class="lf-header__row">
+      <div>
+        <h1>New Post</h1>
+        <p>Share your skills and find exchange partners.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 560px;">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {# Non-field errors #}
+      {% if form.non_field_errors %}
+        <div class="message message--error" style="margin-bottom: 20px;">
+          {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+        </div>
+      {% endif %}
+
+      {# ── About you ────────────────────────────────────────── #}
+      <p class="form-section-title">About You</p>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Your Background</label>
+        {{ form.description }}
+        <p class="form-help">Tell others about your experience and interests.</p>
+        {% if form.description.errors %}
+          <ul class="form-errors">{% for e in form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+
+      {# ── Skills ────────────────────────────────────────────── #}
+      <p class="form-section-title" style="margin-top: 28px;">Skills</p>
+
+      <div class="form-group">
+        <label for="{{ form.skills_offered.id_for_label }}">Skills You Offer</label>
+        {{ form.skills_offered }}
+        <p class="form-help">What can you teach or share?</p>
+        {% if form.skills_offered.errors %}
+          <ul class="form-errors">{% for e in form.skills_offered.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.skills_needed.id_for_label }}">Skills You're Seeking</label>
+        {{ form.skills_needed }}
+        <p class="form-help">What would you like to learn?</p>
+        {% if form.skills_needed.errors %}
+          <ul class="form-errors">{% for e in form.skills_needed.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+
+      {# ── Actions ───────────────────────────────────────────── #}
+      <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px;">
+        <a href="{% url 'skill_exchange:post_list' %}" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">Create Post</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             name='Skill',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('skill_name', models.CharField(max_length=100)),
+                ('name', models.CharField(max_length=100)),
                 ('description', models.TextField()),
             ],
         ),
@@ -62,14 +62,14 @@ class Migration(migrations.Migration):
             name='ExchangePost',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.TextField()),
+                ('description', models.TextField(blank=True, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('deleted_at', models.DateTimeField(blank=True, null=True)),
-                ('users_post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='exchange_posts', to=settings.AUTH_USER_MODEL)),
-                ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.exchangepoststatus')),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending', max_length=20)),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='exchange_posts', to=settings.AUTH_USER_MODEL)),
                 ('skills_offered', models.ManyToManyField(related_name='offered_in_posts', to='skill_exchange.skill')),
-                ('skills_requested', models.ManyToManyField(related_name='requested_in_posts', to='skill_exchange.skill')),
+                ('skills_needed', models.ManyToManyField(related_name='requested_in_posts', to='skill_exchange.skill')),
             ],
         ),
         migrations.CreateModel(
@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('matched_at', models.DateTimeField(auto_now_add=True)),
-                ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.exchangematchstatus')),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('matched', 'Matched'), ('closed', 'Closed')], default='pending', max_length=20)),
                 ('ex_p_a', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='exchange_post_a', to='skill_exchange.exchangepost')),
                 ('ex_p_b', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='exchange_post_b', to='skill_exchange.exchangepost')),
             ],
@@ -88,9 +88,9 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('started_at', models.DateTimeField(auto_now_add=True)),
                 ('ended_at', models.DateTimeField(blank=True, null=True)),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('active', 'Active'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='pending', max_length=20)),
                 ('match', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.exchangematch')),
                 ('thread', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='threads.thread')),
-                ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.exchangesessionstatus')),
             ],
         ),
         migrations.CreateModel(
@@ -98,9 +98,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('decided_at', models.DateTimeField(auto_now_add=True)),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')], default='pending', max_length=20)),
                 ('decided_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='match_decisions', to=settings.AUTH_USER_MODEL)),
                 ('exchange_match', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.exchangematch')),
-                ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.matchdecisionstatus')),
             ],
         ),
         migrations.CreateModel(
@@ -111,10 +111,10 @@ class Migration(migrations.Migration):
                 ('comment', models.TextField(blank=True, null=True)),
                 ('given_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('submitted', 'Submitted'), ('rejected', 'Rejected')], default='pending', max_length=20)),
                 ('exchange_session', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.exchangesession')),
+                ('rated_by_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='feedback_given', to=settings.AUTH_USER_MODEL)),
                 ('rated_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='feedback_received', to=settings.AUTH_USER_MODEL)),
-                ('rater', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='feedback_given', to=settings.AUTH_USER_MODEL)),
-                ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='skill_exchange.sessionfeedbackstatus')),
             ],
         ),
     ]

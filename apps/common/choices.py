@@ -48,7 +48,7 @@ class VoteStatus(models.TextChoices):
 # Skill Exchange domain choices
 class ExchangePostStatus(models.TextChoices):
     PENDING = "pending", "Pending"
-    APPROVED = "approved", "Approved"
+    MATCHED = "matched", "Matched"
     REJECTED = "rejected", "Rejected"
 
 
@@ -69,6 +69,12 @@ class SessionFeedbackStatus(models.TextChoices):
     PENDING = "pending", "Pending"
     SUBMITTED = "submitted", "Submitted"
     REJECTED = "rejected", "Rejected"
+
+
+class SessionEndRequestStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    APPROVED = "approved", "Approved"
+    DENIED = "denied", "Denied"
 
 
 class MatchDecisionStatus(models.TextChoices):
