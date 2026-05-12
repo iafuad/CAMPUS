@@ -42,37 +42,71 @@
         <div class="form-group">
           <label for="first_name">First Name</label>
           <input type="text" id="first_name" name="first_name"
+                 value="{{ form.first_name.value|default:'' }}"
                  placeholder="Ada" required autocomplete="given-name" />
+          {% if form.first_name.errors %}
+            <ul class="form-errors">
+              {% for error in form.first_name.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+          {% endif %}
         </div>
         <div class="form-group">
           <label for="last_name">Last Name</label>
           <input type="text" id="last_name" name="last_name"
+                 value="{{ form.last_name.value|default:'' }}"
                  placeholder="Lovelace" required autocomplete="family-name" />
+          {% if form.last_name.errors %}
+            <ul class="form-errors">
+              {% for error in form.last_name.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+          {% endif %}
         </div>
       </div>
 
       <div class="form-group">
         <label for="handle">Username</label>
         <input type="text" id="handle" name="handle"
+               value="{{ form.handle.value|default:'' }}"
                placeholder="@yourhandle" required autocomplete="username" />
+        {% if form.handle.errors %}
+          <ul class="form-errors">
+            {% for error in form.handle.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
       </div>
 
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">UIU Email</label>
         <input type="email" id="email" name="email"
-               placeholder="you@university.edu" required autocomplete="email" />
+               value="{{ form.email.value|default:'' }}"
+               placeholder="you@bscse.uiu.ac.bd" required autocomplete="email" />
+        {% if form.email.errors %}
+          <ul class="form-errors">
+            {% for error in form.email.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
         <input type="password" id="password" name="password"
                placeholder="••••••••" required autocomplete="new-password" />
+        {% if form.password.errors %}
+          <ul class="form-errors">
+            {% for error in form.password.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="confirm_password">Confirm Password</label>
         <input type="password" id="confirm_password" name="confirm_password"
                placeholder="••••••••" required autocomplete="new-password" />
+        {% if form.confirm_password.errors %}
+          <ul class="form-errors">
+            {% for error in form.confirm_password.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
       </div>
 
       {% if form.non_field_errors %}
@@ -83,7 +117,8 @@
         </ul>
       {% endif %}
 
-      <button type="submit" class="btn btn--primary" style="width: 100%; justify-content: center; margin-top: 4px;">
+      <button type="submit" class="btn btn--primary"
+              style="width: 100%; justify-content: center; margin-top: 4px;">
         Create account
       </button>
     </form>
