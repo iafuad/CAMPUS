@@ -44,7 +44,7 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    student_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
+    student_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
     bio = models.TextField(blank=True)
     photo = models.OneToOneField(
         "media.Photo",
