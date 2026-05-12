@@ -1,0 +1,148 @@
+/* apps/forum/static/forum/css/index.css */
+
+.forum-search-container {
+    max-width: 720px; /* Constrains width so it's not too wide */
+    margin: 0 auto 32px auto; /* Centers the bar and adds a 32px gap at the bottom */
+    padding: 0 20px;
+}
+
+.search-bar-wrapper {
+    background: var(--surface);
+    border: 2px solid var(--border); /* Slightly thicker border for definition */
+    border-radius: 12px;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.search-bar-wrapper:focus-within {
+    border-color: var(--orange);
+    box-shadow: 0 4px 20px rgba(244, 121, 32, 0.1);
+    transform: translateY(-1px);
+}
+
+.search-input-group {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon { 
+    margin-right: 12px; 
+    font-size: 18px;
+    opacity: 0.6;
+}
+
+#fuzzy-search-input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding: 12px 0;
+    font-size: 16px;
+    color: var(--text);
+    font-family: inherit;
+}
+
+#fuzzy-search-input::placeholder {
+    color: var(--text-light);
+}
+
+/* --- Suggestions Dropdown --- */
+.search-suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: -16px;
+    right: -16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 350px;
+    overflow-y: auto;
+    border-top: none;
+}
+
+.suggestion-header {
+    padding: 12px 16px 6px 16px;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--orange);
+    background: var(--surface);
+    font-weight: 700;
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bg);
+}
+
+.suggestion-item:hover {
+    background: var(--orange-light);
+    padding-left: 20px; /* Subtle slide effect */
+    transition: all 0.2s;
+}
+
+/* --- Active Filter Chips --- */
+.active-filters-row {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the chips below the search bar */
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.chip-label {
+    opacity: 0.8;
+    margin-right: 8px;
+}
+
+.chip-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.chip-remove:hover {
+    background: var(--red-light);
+    color: var(--red);
+}
+
+.btn-clear-all {
+    font-size: 13px;
+    color: var(--text-light);
+    text-decoration: none;
+    padding: 6px 12px;
+    transition: color 0.2s;
+}
+
+.btn-clear-all:hover {
+    color: var(--red);
+}

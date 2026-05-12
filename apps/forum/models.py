@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from apps.academics.models import Course, Department, Trimester, Section
+from apps.academics.models import Course, Department, Trimester
 
 
 # Create your models here.
@@ -20,12 +20,13 @@ class ForumThread(models.Model):
         Department, on_delete=models.CASCADE, related_name="forum_threads"
     )
     trimester = models.ForeignKey(
-        Trimester, on_delete=models.CASCADE, related_name="forum_threads"
-    )
-    section = models.ForeignKey(
-        Section, on_delete=models.CASCADE, related_name="forum_threads"
+        Trimester,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="forum_threads",
     )
     thread = models.OneToOneField("threads.Thread", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.author
+        return f"ForumThread(id={self.id}, title={self.thread.title}, author={self.author.email})"

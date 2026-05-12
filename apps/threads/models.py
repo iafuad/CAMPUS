@@ -67,9 +67,16 @@ class ThreadMessage(models.Model):
     upvote_count = models.PositiveIntegerField(default=0)
     downvote_count = models.PositiveIntegerField(default=0)
 
+    is_pinned = models.BooleanField(default=False)
+
     sent_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def net_score(self):
+        """Calculates the total score for template rendering."""
+        return self.upvote_count - self.downvote_count
 
     def __str__(self):
         return f"Message {self.id} in Thread {self.thread.id} by {self.sender.email}"

@@ -48,7 +48,7 @@
     </div>
 
     {% if is_own_profile %}
-      <a href="{% url 'edit_profile' profile.user.handle %}"
+      <a href="{% url 'accounts:edit_profile' profile.user.handle %}"
          class="btn btn--outline btn--sm"
          style="margin-left: auto; align-self: center;">
         Edit Profile

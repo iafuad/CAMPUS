@@ -32,7 +32,7 @@ def profile_view(request, handle):
 def edit_profile(request, handle):
     if request.user.handle != handle:
         # Viewing someone else's edit page — just redirect to their profile
-        return redirect("profile", handle=handle)
+        return redirect("accounts:profile", handle=handle)
 
     user = request.user
     profile = get_object_or_404(UserProfile, user=user)
@@ -115,12 +115,12 @@ def edit_profile(request, handle):
     # trigger a notification here via the notification system.
 
     messages.success(request, "Profile updated successfully.")
-    return redirect("profile", handle=handle)
+    return redirect("accounts:profile", handle=handle)
 
 
 @login_required
 def myself(request):
-    return redirect("profile", handle=request.user.handle)
+    return redirect("accounts:profile", handle=request.user.handle)
 
 
 def register(request):

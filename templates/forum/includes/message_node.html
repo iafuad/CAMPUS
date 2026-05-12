@@ -1,0 +1,79 @@
+<div class="forum-message-node" id="message-{{ message.id }}">
+  <div class="forum-message-box {% if message.sender == request.user %}forum-message--self{% endif %}">
+    <div class="forum-message-voting">
+      <button type="button" class="vote-btn upvote-btn" data-message-id="{{ message.id }}" data-vote-type="upvote" aria-label="Upvote">
+        ▲
+      </button>
+      <span class="vote-count font-mono" id="vote-total-{{ message.id }}">
+        {{ message.net_score }}
+      </span>
+      <button type="button" class="vote-btn downvote-btn" data-message-id="{{ message.id }}" data-vote-type="downvote" aria-label="Downvote">
+        ▼
+      </button>
+    </div>
+
+    <div class="forum-message-body-area">
+      <div class="forum-message-header">
+        <a href="{% url 'accounts:profile' handle=message.sender.handle %}" class="text-decoration-none">
+          <span class="forum-msg-author">{{ message.sender.handle|default:message.sender.email }}</span>
+        </a>
+        {% if message.sender == request.user %}
+          <span class="author-badge-self">(You)</span>
+        {% endif %}
+        {% if message.reply_to %}
+          <span class="replying-to-tag">
+            <i class="reply-icon">↳</i> replying to <span class="reply-handle">@{{ message.reply_to.sender.handle|default:message.reply_to.sender.email }}</span>
+          </span>
+        {% endif %}
+        <span class="forum-msg-time text-light">{{ message.sent_at|timesince }} ago</span>
+      </div>
+
+      <div class="forum-message-content">
+        {{ message.content|linebreaks }}
+      </div>
+
+      {% if message.attachments.all %}
+        <div class="forum-message-gallery mt-8">
+          {% for attachment in message.attachments.all %}
+            <a href="{{ attachment.photo.file.url }}" target="_blank" class="gallery-thumb">
+              <img src="{{ attachment.photo.file.url }}" alt="Attached photo">
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="forum-message-actions mt-8">
+        <button type="button" class="btn btn--ghost btn--sm toggle-reply-btn" data-target-id="{{ message.id }}">
+          💬 Reply
+        </button>
+      </div>
+
+      <div class="forum-inline-reply-container mt-8" id="reply-form-{{ message.id }}" style="display: none;">
+        <form method="post" enctype="multipart/form-data" action="{% url 'forum:thread_detail' base_thread.forumthread.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="reply_to" value="{{ message.id }}">
+          <div class="form-group mb-4">
+            <textarea name="content" rows="2" placeholder="Replying to {{ message.sender.handle|default:message.sender.email }}..." required></textarea>
+          </div>
+          <div class="flex items-center justify-between">
+            <input type="file" name="uploaded_photos" multiple class="text-small" style="max-width: 200px;">
+            <div class="flex flex-gap-8">
+              <button type="button" class="btn btn--ghost btn--sm cancel-reply-btn" data-target-id="{{ message.id }}">Cancel</button>
+              <button type="submit" class="btn btn--primary btn--sm">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% if message.replies_list %}
+    <div class="forum-nested-replies {% if depth >= 6 %}flattened{% endif %}">
+      {% for reply in message.replies_list %}
+        {% with next_depth=depth|add:1 %}
+          {% include "forum/includes/message_node.html" with message=reply depth=next_depth %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

@@ -1,0 +1,94 @@
+document.addEventListener('DOMContentLoaded', () => {
+  // Extract CSRF token from page cookies securely
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  const csrfToken = getCookie('csrftoken');
+
+  // --- 1. Inline Reply Form Toggling ---
+  document.addEventListener('click', (e) => {
+    // Open reply input
+    if (e.target.closest('.toggle-reply-btn')) {
+      const btn = e.target.closest('.toggle-reply-btn');
+      const targetId = btn.getAttribute('data-target-id');
+      const container = document.getElementById(`reply-form-${targetId}`);
+      if (container) {
+        container.style.display = 'block';
+        const textarea = container.querySelector('textarea');
+        if (textarea) textarea.focus();
+      }
+    }
+
+    // Close reply input
+    if (e.target.closest('.cancel-reply-btn')) {
+      const btn = e.target.closest('.cancel-reply-btn');
+      const targetId = btn.getAttribute('data-target-id');
+      const container = document.getElementById(`reply-form-${targetId}`);
+      if (container) {
+        container.style.display = 'none';
+      }
+    }
+  });
+
+  // --- 2. AJAX Voting Engine ---
+  document.addEventListener('click', async (e) => {
+    const voteBtn = e.target.closest('.vote-btn');
+    if (!voteBtn) return;
+
+    e.preventDefault();
+    const messageId = voteBtn.getAttribute('data-message-id');
+    const voteType = voteBtn.getAttribute('data-vote-type'); // 'upvote' or 'downvote'
+
+    try {
+      const response = await fetch(`/forum/messages/${messageId}/vote/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrfToken
+        },
+        body: new URLSearchParams({ 'vote_type': voteType })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network error processing vote.');
+      }
+
+      const data = await response.json();
+      
+      // Calculate dynamic net balance
+      const netScore = data.upvote_count - data.downvote_count;
+      const countDisplay = document.getElementById(`vote-total-${messageId}`);
+      if (countDisplay) {
+        countDisplay.textContent = netScore;
+      }
+
+      // Visual active-state indicators
+      const parentBlock = voteBtn.closest('.forum-message-voting');
+      const upBtn = parentBlock.querySelector('.upvote-btn');
+      const downBtn = parentBlock.querySelector('.downvote-btn');
+
+      if (voteType === 'upvote') {
+        upBtn.classList.toggle('active-upvote');
+        downBtn.classList.remove('active-downvote');
+      } else {
+        downBtn.classList.toggle('active-downvote');
+        upBtn.classList.remove('active-upvote');
+      }
+
+    } catch (error) {
+      console.error('Voting execution failed:', error);
+    }
+  });
+});
