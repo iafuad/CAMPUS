@@ -7,6 +7,7 @@ from django.http import Http404
 from .models import (
     LostAndFoundPost,
     LostAndFoundPhoto,
+    LostAndFoundTag,
     ClaimRequest,
     ClaimThread,
     SuggestedMatch,
@@ -171,7 +172,24 @@ def post_create(request):
     else:
         form = LostAndFoundPostForm()
 
-    return render(request, "lost_found/post_form.html", {"form": form})
+    all_tags = LostAndFoundTag.objects.order_by("name")
+    selected_tag_ids = form["tags"].value() or []
+    if isinstance(selected_tag_ids, str):
+        selected_tag_ids = [selected_tag_ids]
+    selected_tags = LostAndFoundTag.objects.filter(pk__in=selected_tag_ids).order_by(
+        "name"
+    )
+
+    return render(
+        request,
+        "lost_found/post_form.html",
+        {
+            "form": form,
+            "all_tags": all_tags,
+            "selected_tag_ids": selected_tag_ids,
+            "selected_tags": selected_tags,
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
