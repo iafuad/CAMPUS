@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{# ── Forum sub-navigation ─────────────────────────────
+   Renders a thin strip below the global nav with Forum-specific
+   links. All forum templates continue to extend this file
+   exactly as before — nothing else changes for them.
+#}
+{% block subnav %}
+<div class="campus-subnav">
+  <div class="campus-subnav__inner">
+
+    <a href="{% url 'forum:index' %}"
+       {% if request.resolver_match.url_name == 'index' %}class="active"{% endif %}>
+      All Threads
+    </a>
+    <a href="#"
+       {% if request.resolver_match.url_name == 'my_threads' %}class="active"{% endif %}>
+      My Threads
+    </a>
+    <a href="#"
+       {% if request.resolver_match.url_name == 'following' %}class="active"{% endif %}>
+      Following
+    </a>
+    <a href="{% url 'forum:thread_create' %}"
+       {% if request.resolver_match.url_name == 'thread_create' %}class="active"{% endif %}>
+      + Create Thread
+    </a>
+
+  </div>
+</div>
+{% endblock %}

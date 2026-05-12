@@ -1,0 +1,223 @@
+/* ── Forum Filters & Layouts ──────────────────────────────── */
+.forum-filter-grid {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .forum-filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Reddit-Style Nesting System ──────────────────────────── */
+.forum-message-node {
+  margin-bottom: 12px;
+}
+
+.forum-message-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  transition: border-color 0.15s;
+}
+
+.forum-message-box:hover {
+  border-color: var(--border-dark);
+}
+
+/* Indented container for all nested child nodes */
+.forum-nested-replies {
+  margin-top: 8px;
+  margin-left: 24px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+
+/* Change thread-line highlight on hover */
+.forum-nested-replies:hover {
+  border-left-color: var(--orange-border);
+}
+
+/* Stop indenting after depth 6 */
+.forum-nested-replies.flattened {
+  margin-left: 0; /* Remove the left margin/indent */
+  border-left: none; /* Optionally remove the thread line */
+  padding-left: 0;
+}
+
+/* ── Voting Mechanisms ────────────────────────────────────── */
+.forum-message-voting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  flex-shrink: 0;
+}
+
+.vote-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: var(--radius);
+  transition: background 0.15s, color 0.15s;
+}
+
+.vote-btn:hover {
+  background: var(--gray-light);
+  color: var(--text);
+}
+
+.vote-btn.active-upvote { color: var(--green); }
+.vote-btn.active-downvote { color: var(--red); }
+
+.vote-count {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 2px 0;
+  color: var(--text);
+}
+
+/* ── Internal Node Components ─────────────────────────────── */
+.forum-message-body-area {
+  flex-grow: 1;
+  min-width: 0; /* allows texts to break inside flexbox */
+}
+
+.forum-message-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.forum-msg-author {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.forum-msg-time {
+  font-size: 12px;
+}
+
+.forum-message-content {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.forum-message-content p {
+  margin-bottom: 6px;
+}
+
+.forum-message-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Custom container styling for the user's own messages */
+.forum-message--self {
+    background-color: var(--orange-light);
+    border: 1px solid var(--orange-border);
+    border-left: 3px solid var(--orange); /* Thicker accent bar on the left */
+}
+
+/* Ensure dark mode handles the custom background gracefully if needed */
+[data-theme="dark"] .forum-message--self {
+    background-color: rgba(244, 121, 32, 0.05); /* Highly transparent orange tint */
+    border-color: rgba(244, 121, 32, 0.2);
+}
+
+/* Styling for the small '(You)' indicator */
+.author-badge-self {
+    font-size: 11px;
+    color: var(--orange);
+    font-weight: 600;
+    margin-left: 4px;
+    background: rgba(244, 121, 32, 0.1);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.replying-to-tag {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--bg); /* Light gray background */
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin: 0 0px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--border);
+}
+
+.reply-icon {
+    font-style: normal;
+    color: var(--orange); /* Use your theme color for the arrow */
+    font-weight: bold;
+}
+
+.reply-handle {
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* Optional: Smooth hover effect to show which message is being replied to */
+.replying-to-tag:hover {
+    border-color: var(--orange-border);
+    cursor: default;
+}
+
+/* Apply this to the containers holding your text */
+.card__body, .forum-msg-content {
+    white-space: pre-wrap; /* Preserves sequences of white space and line breaks */
+    word-wrap: break-word; /* Ensures long words don't overflow the container */
+}
+
+/* ── Attachments Gallery Thumbnail ────────────────────────── */
+.forum-message-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gallery-thumb {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.gallery-thumb:hover img {
+  transform: scale(1.05);
+}
+
+/* ── Inline Utilities ─────────────────────────────────────── */
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
