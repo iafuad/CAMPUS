@@ -180,7 +180,11 @@
 
         <div class="detail-meta-row">
           <dt>Posted by</dt>
-          <dd>{{ post.user.email }}</dd>
+          <dd>
+            <a href="{% url 'accounts:profile' handle=post.user.handle %}">
+              {{ post.user.handle }}
+            </a>
+          </dd>
         </div>
 
         <div class="detail-meta-row">

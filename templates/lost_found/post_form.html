@@ -1,5 +1,5 @@
 {% extends "lost_found/base.html" %}
-
+{% load static %}
 {% block title %}New Post{% endblock %}
 
 {% block content %}
@@ -86,10 +86,50 @@
     {% if form.tags %}
       <div class="form-group">
         <label>Tags <span class="text-muted">(optional — helps with matching)</span></label>
-        {{ form.tags }}
         {% if form.tags.errors %}
           <ul class="form-errors">{% for e in form.tags.errors %}<li>{{ e }}</li>{% endfor %}</ul>
         {% endif %}
+
+        <div class="tag-picker">
+          <div class="selected-chips" id="e-selectedTags">
+            <span class="chips-placeholder" id="e-tagsPlaceholder"
+                  {% if selected_tags %}style="display:none"{% endif %}>
+              None selected — pick tags to help matching
+            </span>
+            {% for tag in selected_tags %}
+              <span class="selected-chip" data-id="{{ tag.id }}">
+                {{ tag.name }}
+                <button class="chip-remove" type="button" onclick="removeTag('{{ tag.id }}')">×</button>
+              </span>
+            {% endfor %}
+          </div>
+
+          <div id="tag-hidden-inputs">
+            {% for tag in selected_tags %}
+              <input type="hidden" name="tags" value="{{ tag.id }}">
+            {% endfor %}
+          </div>
+
+          <input type="text"
+                 id="e-tagSearch"
+                 class="form-group input"
+                 placeholder="Search tags..."
+                 autocomplete="off"
+                 style="margin-top: 10px; display: block; width: 100%; padding: 8px 11px; border: 1.5px solid var(--border-dark); border-radius: var(--radius) var(--radius) 0 0; font-family: inherit; font-size: 14px; outline: none; background: var(--surface); color: var(--text); border-bottom-color: var(--border);">
+
+          <div class="skills-pool tags-pool" id="e-tagsPool">
+            {% for tag in all_tags %}
+              <div class="pool-item {% if tag.id in selected_tag_ids %}pool-item--selected{% endif %}"
+                   data-id="{{ tag.id }}"
+                   data-name="{{ tag.name }}"
+                   onclick="addTag(this)"
+                   {% if tag.id in selected_tag_ids %}style="display:none"{% endif %}>
+                {{ tag.name }}
+              </div>
+            {% endfor %}
+            <div class="pool-empty" id="e-tagsPoolEmpty" style="display:none;">No matching tags</div>
+          </div>
+        </div>
       </div>
     {% endif %}
 
@@ -118,4 +158,8 @@
   </form>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'lost_found/js/lost_found.js' %}"></script>
 {% endblock %}
