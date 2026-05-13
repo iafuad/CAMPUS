@@ -144,22 +144,23 @@ def thread_detail(request, pk):
         "sender", "reply_to"
     ).prefetch_related("attachments__photo")
 
-    # 2. Get sort parameter from URL (default to chronological/oldest)
+    # 2. Identify the Pinned/Accepted Answer
+    # We fetch this to display it in a special "Hero" slot at the top of the page.
+    pinned_answer = messages_qs.filter(is_pinned=True).first()
+
+    # 3. Get sort parameter from URL
     sort_option = request.GET.get("sort", "oldest")
 
     if sort_option == "top":
-        # Annotate net score in SQL and order descending
         messages = messages_qs.annotate(
             db_net_score=F("upvote_count") - F("downvote_count")
         ).order_by("-db_net_score", "sent_at")
-
     elif sort_option == "latest":
         messages = messages_qs.order_by("-sent_at")
-
     else:  # "oldest"
         messages = messages_qs.order_by("sent_at")
 
-    # 3. Build Reddit-style nested tree hierarchy
+    # 4. Build Reddit-style nested tree hierarchy
     message_dict = {}
     root_messages = []
 
@@ -168,7 +169,7 @@ def thread_detail(request, pk):
         msg.replies_list = []
         message_dict[msg.id] = msg
 
-    # Second pass: group into parents/roots preserving the sorted order
+    # Second pass: group into parents/roots
     for msg in messages:
         if msg.reply_to_id and msg.reply_to_id in message_dict:
             message_dict[msg.reply_to_id].replies_list.append(msg)
@@ -179,10 +180,45 @@ def thread_detail(request, pk):
         "forum_thread": forum_thread,
         "base_thread": base_thread,
         "root_messages": root_messages,
+        "pinned_answer": pinned_answer,
         "form": form,
-        "current_sort": sort_option,  # pass to template to highlight active tab
+        "current_sort": sort_option,
     }
     return render(request, "forum/thread_detail.html", context)
+
+
+@login_required
+@require_POST
+def toggle_message_pin(request, message_id):
+    # 1. Fetch message and the associated ForumThread
+    message = get_object_or_404(ThreadMessage, pk=message_id)
+    try:
+        forum_thread = message.thread.forumthread
+    except ForumThread.DoesNotExist:
+        return JsonResponse({"error": "Forum thread not found"}, status=404)
+
+    # 2. Permission Check: Only the thread author can pin
+    if forum_thread.author != request.user:
+        return JsonResponse({"error": "Only the author can mark an answer"}, status=403)
+
+    with transaction.atomic():
+        if message.is_pinned:
+            # Unpin current
+            message.is_pinned = False
+            message.save()
+            action = "unpinned"
+        else:
+            # 3. Enforce Exclusivity: Unpin all other messages in this thread
+            ThreadMessage.objects.filter(thread=message.thread, is_pinned=True).update(
+                is_pinned=False
+            )
+
+            # Pin the new one
+            message.is_pinned = True
+            message.save()
+            action = "pinned"
+
+    return JsonResponse({"status": "success", "action": action})
 
 
 @require_POST

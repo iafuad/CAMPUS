@@ -36,13 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = e.target.closest('.cancel-reply-btn');
       const targetId = btn.getAttribute('data-target-id');
       const container = document.getElementById(`reply-form-${targetId}`);
-      if (container) {
-        container.style.display = 'none';
-      }
+      if (container) container.style.display = 'none';
     }
   });
 
-  // --- 2. AJAX Voting Engine ---
+  // --- 2. Voting Logic (Upvote/Downvote) ---
   document.addEventListener('click', async (e) => {
     const voteBtn = e.target.closest('.vote-btn');
     if (!voteBtn) return;
@@ -61,18 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
         body: new URLSearchParams({ 'vote_type': voteType })
       });
 
-      if (!response.ok) {
-        throw new Error('Network error processing vote.');
-      }
+      if (!response.ok) throw new Error('Network error processing vote.');
 
       const data = await response.json();
       
-      // Calculate dynamic net balance
+      // Update score display
       const netScore = data.upvote_count - data.downvote_count;
       const countDisplay = document.getElementById(`vote-total-${messageId}`);
-      if (countDisplay) {
-        countDisplay.textContent = netScore;
-      }
+      if (countDisplay) countDisplay.textContent = netScore;
 
       // Visual active-state indicators
       const parentBlock = voteBtn.closest('.forum-message-voting');
@@ -86,9 +80,33 @@ document.addEventListener('DOMContentLoaded', () => {
         downBtn.classList.toggle('active-downvote');
         upBtn.classList.remove('active-upvote');
       }
-
     } catch (error) {
-      console.error('Voting execution failed:', error);
+      console.error("Voting error:", error);
+    }
+  });
+
+  // --- 3. Pinning / Mark as Best Answer Logic ---
+  document.addEventListener('click', async (e) => {
+    const pinBtn = e.target.closest('.btn-pin-message');
+    if (!pinBtn) return;
+
+    const messageId = pinBtn.getAttribute('data-message-id');
+    
+    try {
+      const response = await fetch(`/forum/messages/${messageId}/pin/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken }
+      });
+
+      if (response.ok) {
+        // Reload to reflect new pinning order and badges
+        window.location.reload(); 
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Failed to update pin status.");
+      }
+    } catch (error) {
+      console.error("Pinning error:", error);
     }
   });
 });

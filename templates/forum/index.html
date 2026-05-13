@@ -74,7 +74,7 @@
               👤 <strong>{{ f_thread.author.handle|default:f_thread.author.email }}</strong>
             </span>
             <span class="card__meta-item">
-              🏛️ {{ f_thread.department.short_code }} | {{ f_thread.course.code }}
+              🏛️ {{ f_thread.department.short_code }} | {{ f_thread.course.name }}
             </span>
             <span class="card__meta-item text-light">
               🕒 {{ f_thread.thread.created_at|date:"M d, Y" }}

@@ -33,8 +33,8 @@ class ThreadAdmin(admin.ModelAdmin):
 
 @admin.register(ThreadMessage)
 class ThreadMessageAdmin(admin.ModelAdmin):
-    list_display = ("id", "thread", "sender", "short_content", "sent_at")
-    list_filter = ("sent_at", "status")
+    list_display = ("id", "thread", "sender", "short_content", "is_pinned", "sent_at")
+    list_filter = ("is_pinned", "sent_at", "status")
     search_fields = ("content", "sender__email")
 
     inlines = [MessageAttachmentInline]

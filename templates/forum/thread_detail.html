@@ -28,7 +28,7 @@
         👤 Posted by <strong>{{ forum_thread.author.handle|default:forum_thread.author.email }}</strong>
       </span>
       <span class="card__meta-item">
-        📚 {{ forum_thread.department.short_code }} - {{ forum_thread.course.code }}
+        📚 {{ forum_thread.department.short_code }} - {{ forum_thread.course.name }}
       </span>
       <span class="card__meta-item text-light">
         🕒 {{ base_thread.created_at|date:"M d, Y h:i A" }}
@@ -37,7 +37,7 @@
 
     {% if base_thread.description %}
       <div class="card__body mt-16" style="color: var(--text); font-size: 15px;">
-        {{ base_thread.description|linebreaks }}
+        {{ base_thread.description }}
       </div>
     {% endif %}
   </section>
@@ -59,6 +59,16 @@
         🕒 Oldest
       </a>
     </div>
+
+  {% if pinned_answer %}
+    <section class="pinned-answer-container mb-32">
+      <div class="text-small text-muted mb-8 uppercase tracking-widest font-bold">
+        ✅ Accepted Answer
+      </div>
+      {% include "forum/includes/message_node.html" with message=pinned_answer depth=1 %}
+      <div class="mt-24 border-bottom"></div>
+    </section>
+  {% endif %}
 
   <section class="forum-message-tree mb-24">
     {% for message in root_messages %}

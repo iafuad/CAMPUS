@@ -10,10 +10,23 @@
       <button type="button" class="vote-btn downvote-btn" data-message-id="{{ message.id }}" data-vote-type="downvote" aria-label="Downvote">
         ▼
       </button>
+      {% if base_thread.forumthread.author == request.user and depth == 1 %}
+        <button type="button" 
+                class="btn-pin-message" 
+                data-message-id="{{ message.id }}"
+                title="Mark as Best Answer">
+          ★
+        </button>
+      {% endif %}
     </div>
 
     <div class="forum-message-body-area">
       <div class="forum-message-header">
+        <div class="flex items-center flex-gap-8">
+          {% if message.is_pinned %}
+            <span class="pinned-badge {% if message.is_pinned %}is-active{% endif %}">✅ Best Answer</span>
+          {% endif %}
+        </div>
         <a href="{% url 'accounts:profile' handle=message.sender.handle %}" class="text-decoration-none">
           <span class="forum-msg-author">{{ message.sender.handle|default:message.sender.email }}</span>
         </a>
