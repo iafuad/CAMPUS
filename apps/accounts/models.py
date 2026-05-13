@@ -68,8 +68,9 @@ class UserProfile(models.Model):
         choices=ProfileStatus.choices,
         default=ProfileStatus.PENDING,
     )
-    is_verified = models.BooleanField(default=False)
     is_graduated = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    is_moderator = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
