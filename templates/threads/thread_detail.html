@@ -1,4 +1,4 @@
-{% extends "lost_found/base.html" %}
+{% extends base_template|default:"base.html" %}
 {% load static %}
 
 {% block title %}{{ thread.title }}{% endblock %}
@@ -22,14 +22,18 @@
 </div>
 
 {# ── Optional context banner (e.g. claim details) ──────────── #}
-{% if claim_context %}
-  {% include "lost_found/_claim_thread_context.html" with ctx=claim_context %}
+{% if lost_found_context %}
+  {% include "lost_found/_claim_thread_context.html" with ctx=lost_found_context %}
+{% endif %}
+
+{% if skill_exchange_context %}
+  {% include "skill_exchange/_session_thread_context.html" with ctx=skill_exchange_context %}
 {% endif %}
 
 {# ── Message feed ──────────────────────────────────────────── #}
 <div class="threads-message-list" id="message-list">
 
-  {% for msg in messages %}
+  {% for msg in thread_messages %}
 
     {% if msg.sender == user %}
       {# ── Own message ─────────────────────────────────────── #}
@@ -105,51 +109,57 @@
 </div>{# /message-list #}
 
 {# ── Compose ───────────────────────────────────────────────── #}
-<form class="threads-compose" method="post" enctype="multipart/form-data">
-  {% csrf_token %}
+{% if thread.status == 'open' %}
+  <form class="threads-compose" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 
-  {# Photo preview strip — populated by threads.js #}
-  <div id="thread-photo-preview" class="threads-compose__preview"></div>
+    {# Photo preview strip — populated by threads.js #}
+    <div id="thread-photo-preview" class="threads-compose__preview"></div>
 
-  <textarea
-    class="threads-compose__textarea"
-    name="content"
-    placeholder="Write a message…"
-    rows="3"
-    required
-  ></textarea>
+    <textarea
+      class="threads-compose__textarea"
+      name="content"
+      placeholder="Write a message…"
+      rows="3"
+      required
+    ></textarea>
 
-  <div class="threads-compose__toolbar">
-    <div class="threads-compose__left">
-      {# Hidden real file input #}
-      <input type="file"
-             id="thread-photos"
-             name="photos"
-             multiple
-             accept="image/*"
-             style="display: none;">
+    <div class="threads-compose__toolbar">
+      <div class="threads-compose__left">
+        {# Hidden real file input #}
+        <input type="file"
+              id="thread-photos"
+              name="photos"
+              multiple
+              accept="image/*"
+              style="display: none;">
 
-      {# Visible styled label acts as the trigger #}
-      <label for="thread-photos" class="threads-attach-label">
-        {# paperclip icon — inline SVG, no external dependency #}
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19
-                   a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83
-                   l8.49-8.48"/>
-        </svg>
-        Attach photos
-      </label>
+        {# Visible styled label acts as the trigger #}
+        <label for="thread-photos" class="threads-attach-label">
+          {# paperclip icon — inline SVG, no external dependency #}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19
+                    a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83
+                    l8.49-8.48"/>
+          </svg>
+          Attach photos
+        </label>
 
-      {# File count — filled by threads.js #}
-      <span id="thread-attach-count" class="threads-attach-count"></span>
+        {# File count — filled by threads.js #}
+        <span id="thread-attach-count" class="threads-attach-count"></span>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--sm">Send</button>
     </div>
-
-    <button type="submit" class="btn btn--primary btn--sm">Send</button>
+  </form>
+{% else %}
+  <div class="alert alert--warning" style="background: var(--orange-light); padding: 12px; border: 1px solid var(--orange-border); margin: 0 auto; text-align: center;">
+      <p style="margin-bottom: 10px;"><i>This thread is closed, you can no longer send messages.</i></p>
   </div>
-</form>
+{% endif %}
 
 {% endblock %}
 

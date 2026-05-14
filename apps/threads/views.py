@@ -16,6 +16,10 @@ def thread_detail(request, thread_id):
     if not ThreadParticipant.objects.filter(thread=thread, user=request.user).exists():
         return HttpResponseForbidden("You are not a participant of this thread!")
 
+    base_template = "base.html"
+    lost_found_context = None
+    skill_exchange_context = None
+
     if request.method == "POST":
         content = request.POST.get("content", "").strip()
         files = request.FILES.getlist("photos")
@@ -39,12 +43,20 @@ def thread_detail(request, thread_id):
                 reverse("threads:thread_detail", args=[thread.id])
             )
 
+    if hasattr(thread, "claim_thread"):
+        base_template = "lost_found/base.html"
+    elif hasattr(thread, "exchange_session"):
+        skill_exchange_context = getattr(thread, "exchange_session")
+        base_template = "skill_exchange/base.html"
+
     context = {
         "thread": thread,
-        "messages": thread.messages.select_related("sender")
+        "thread_messages": thread.messages.select_related("sender")
         .prefetch_related("attachments__photo")
         .order_by("sent_at"),
-        "claim_context": getattr(thread, "claim_thread", None),
+        "lost_found_context": lost_found_context,
+        "skill_exchange_context": skill_exchange_context,
+        "base_template": base_template,
     }
 
     return render(request, "threads/thread_detail.html", context)
