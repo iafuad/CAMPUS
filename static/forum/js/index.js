@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyFilter(type, item) {
     const params = new URLSearchParams(window.location.search);
     if (type === 'dept') {
-      params.set('department', item.id);
+      params.set('department', item.code);
     } else {
       params.set('course', item.code);
     }

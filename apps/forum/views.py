@@ -32,24 +32,22 @@ def forum_index(request):
         .order_by("-thread__created_at")
     )
 
-    dept_id = request.GET.get("department")
-    course_query = request.GET.get("course")
+    dept_code = request.GET.get("department")
+    course_code = request.GET.get("course")
 
     active_filters = []
 
-    if dept_id and dept_id.isdigit():
-        threads = threads.filter(department_id=dept_id)
-        dept_obj = Department.objects.filter(id=dept_id).first()
+    if dept_code:
+        threads = threads.filter(department__short_code=dept_code)
+        dept_obj = Department.objects.filter(short_code=dept_code).first()
         if dept_obj:
-            active_filters.append(
-                {"type": "dept", "id": dept_id, "label": dept_obj.short_code}
-            )
+            active_filters.append({"type": "dept", "label": dept_obj.name})
 
-    if course_query:
-        threads = threads.filter(course__code__icontains=course_query)
-        active_filters.append(
-            {"type": "course", "val": course_query, "label": course_query}
-        )
+    if course_code:
+        threads = threads.filter(course__code=course_code)
+        course_obj = Course.objects.filter(code=course_code).first()
+        if course_obj:
+            active_filters.append({"type": "course", "label": course_obj.name})
 
     context = {
         "threads": threads,
