@@ -4,17 +4,16 @@
 
 {% block content %}
 
-<div class="lf-header">
-  <div class="lf-header__row">
-    <div>
-      <h1>New Post</h1>
-      <p>Report a lost or found item on campus.</p>
+<div class="lf-wrap" style="max-width: 680px;">
+  <div class="lf-header">
+    <div class="lf-header__row">
+      <div>
+        <h1>New Post</h1>
+        <p>Report a lost or found item on campus.</p>
+      </div>
     </div>
   </div>
-</div>
-
-<div style="max-width: 560px;">
-  <form method="post" enctype="multipart/form-data" novalidate>
+  <form class="card" method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
 
     {# Non-field errors #}
