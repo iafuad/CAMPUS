@@ -89,17 +89,7 @@ function removeTag(id) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-
-  /* ── 1. Auto-dismiss flash messages after 5 s ─────────────── */
-  document.querySelectorAll('.message').forEach(function (el) {
-    setTimeout(function () {
-      el.style.transition = 'opacity .4s';
-      el.style.opacity = '0';
-      setTimeout(function () { el.remove(); }, 400);
-    }, 5000);
-  });
-
-  /* ── 2. Photo upload preview ──────────────────────────────── */
+  /* ── 1. Photo upload preview ──────────────────────────────── */
   var photoInput = document.getElementById('id_uploaded_photos');
   if (photoInput) {
     photoInput.addEventListener('change', function () {
@@ -122,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* ── 3. Tag picker for lost & found posts ──────────────── */
+  /* ── 2. Tag picker for lost & found posts ──────────────── */
   document.querySelectorAll('#e-selectedTags .selected-chip').forEach(function (chip) {
     var nameEl = chip.firstChild;
     var name   = nameEl ? nameEl.textContent.trim() : chip.dataset.id;

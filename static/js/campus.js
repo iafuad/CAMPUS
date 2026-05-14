@@ -21,4 +21,13 @@ document.addEventListener('DOMContentLoaded', function () {
       next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
     );
   });
+
+  /* ── Auto-dismiss flash messages after 5 s ─────────────── */
+  document.querySelectorAll('.message').forEach(function (el) {
+    setTimeout(function () {
+      el.style.transition = 'opacity .4s';
+      el.style.opacity = '0';
+      setTimeout(function () { el.remove(); }, 400);
+    }, 3000);
+  });
 });

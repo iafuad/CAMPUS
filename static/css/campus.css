@@ -194,10 +194,10 @@ img { max-width: 100%; display: block; }
   }
 }
 
-.message--success { background: var(--green-light);  border-color: var(--green);  color: #1a6047; }
-.message--error   { background: var(--red-light);    border-color: var(--red);    color: #8b1e22; }
-.message--info    { background: var(--blue-light);   border-color: var(--blue);   color: #1a3e8c; }
-.message--warning { background: var(--amber-light);  border-color: var(--amber);  color: #7a4f00; }
+.message--success { background: var(--green-light);  border-color: var(--green);  color: #ffffff; }
+.message--error   { background: var(--red-light);    border-color: var(--red);    color: #ffffff; }
+.message--info    { background: var(--blue-light);   border-color: var(--blue);   color: #ffffff; }
+.message--warning { background: var(--amber-light);  border-color: var(--amber);  color: #ffffff; }
 
 /* Remove the margin-top utility since we use 'gap' in the fixed container */
 .message + .message { margin-top: 0; }

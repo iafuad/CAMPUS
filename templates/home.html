@@ -48,7 +48,7 @@
   <div class="features-grid">
 
     {# 1. Skill Exchange #}
-    <a href="#" class="feature-card">
+    <a href="{% url 'skill_exchange:post_list' %}" class="feature-card">
       <div class="feature-card__icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -60,11 +60,11 @@
       <p class="feature-card__desc">
         Trade knowledge with peers. Teach what you know, learn what you need.
       </p>
-      <span class="feature-card__link">Coming soon →</span>
+      <span class="feature-card__link">Open →</span>
     </a>
 
     {# 2. Discussion Forum #}
-    <a href="#" class="feature-card">
+    <a href="{% url 'forum:index' %}" class="feature-card">
       <div class="feature-card__icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -75,7 +75,7 @@
       <p class="feature-card__desc">
         Ask questions, share ideas, and find study groups for any subject.
       </p>
-      <span class="feature-card__link">Coming soon →</span>
+      <span class="feature-card__link">Open →</span>
     </a>
 
     {# 3. Lost & Found #}
